@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Header } from "@/components/layout";
 import Landing from "./pages/Landing";
 import Scenarios from "./pages/Scenarios";
+import Matrix from "./pages/Matrix";
 import Compare from "./pages/Compare";
 import Run from "./pages/Run";
 import Diff from "./pages/Diff";
@@ -56,6 +57,7 @@ function AnimatedRoutes() {
         <Routes location={location}>
           <Route path="/" element={<Landing />} />
           <Route path="/scenarios" element={<Scenarios />} />
+          <Route path="/matrix" element={<Matrix />} />
           <Route path="/compare" element={<Compare />} />
           <Route path="/run" element={<Run />} />
           <Route path="/diff" element={<Diff />} />
