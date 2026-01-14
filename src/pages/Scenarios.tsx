@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { LayoutGrid } from 'lucide-react';
 import { scenarios } from '@/lib/data/scenarios';
 import { Category } from '@/lib/types';
 import { AnimatedBackground } from '@/components/effects';
@@ -94,13 +95,22 @@ export default function Scenarios() {
           </div>
         )}
         
-        {/* Bottom hint */}
-        <p 
-          className="text-center text-sm text-muted-foreground/60 mt-16 font-mono animate-fade-in" 
+        {/* Bottom actions */}
+        <div 
+          className="flex flex-col items-center gap-4 mt-16 animate-fade-in" 
           style={{ animationDelay: '600ms' }}
         >
-          {filteredScenarios.length} scenario{filteredScenarios.length !== 1 ? 's' : ''} available
-        </p>
+          <Link
+            to="/matrix"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors text-sm"
+          >
+            <LayoutGrid className="w-4 h-4" />
+            View Comparison Matrix
+          </Link>
+          <p className="text-sm text-muted-foreground/60 font-mono">
+            {filteredScenarios.length} scenario{filteredScenarios.length !== 1 ? 's' : ''} available
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ interface BreadcrumbItem {
 
 const routeConfig: Record<string, { label: string; order: number }> = {
   '/scenarios': { label: 'Scenarios', order: 1 },
+  '/matrix': { label: 'Matrix', order: 0 },
   '/compare': { label: 'Compare', order: 2 },
   '/run': { label: 'Run', order: 3 },
   '/diff': { label: 'Divergence', order: 4 },
