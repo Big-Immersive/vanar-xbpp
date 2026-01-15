@@ -2,18 +2,12 @@ import { AnimatedBackground } from '@/components/effects';
 import {
   HeroSection,
   ProblemSection,
-  InsightSection,
-  LandscapeSection,
   WhatIsSection,
   ParadigmShiftSection,
   HowItWorksSection,
-  TheMomentSection,
-  WhyMattersSection,
+  UseCaseCarousel,
+  PlaygroundPreview,
   WhoIsForSection,
-  DifferentSection,
-  StandardSection,
-  NotSection,
-  WhyNowSection,
   FinalCTASection,
   Footer,
 } from '@/components/landing';
@@ -23,21 +17,34 @@ export default function Landing() {
     <div className="relative overflow-hidden">
       <AnimatedBackground variant="default" />
       
+      {/* 1. Hero - The hook */}
       <HeroSection />
+      
+      {/* 2. Problem - The Agentic Gap */}
       <ProblemSection />
-      <InsightSection />
-      <LandscapeSection />
+      
+      {/* 3. Solution - What is xBPP */}
       <WhatIsSection />
+      
+      {/* 4. Paradigm Shift - Before/After comparison */}
       <ParadigmShiftSection />
+      
+      {/* 5. How It Works - Architecture of Trust */}
       <HowItWorksSection />
-      <TheMomentSection />
-      <WhyMattersSection />
+      
+      {/* 6. Use Cases - Interactive carousel */}
+      <UseCaseCarousel />
+      
+      {/* 7. Playground Preview - Interactive demo teaser */}
+      <PlaygroundPreview />
+      
+      {/* 8. Who It's For - Target personas */}
       <WhoIsForSection />
-      <DifferentSection />
-      <StandardSection />
-      <NotSection />
-      <WhyNowSection />
+      
+      {/* 9. Final CTA */}
       <FinalCTASection />
+      
+      {/* Footer */}
       <Footer />
     </div>
   );

@@ -14,3 +14,5 @@ export { NotSection } from './NotSection';
 export { WhyNowSection } from './WhyNowSection';
 export { FinalCTASection } from './FinalCTASection';
 export { Footer } from './Footer';
+export { UseCaseCarousel } from './UseCaseCarousel';
+export { PlaygroundPreview } from './PlaygroundPreview';

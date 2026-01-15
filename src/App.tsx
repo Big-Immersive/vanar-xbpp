@@ -16,6 +16,7 @@ import Export from "./pages/Export";
 import Spec from "./pages/Spec";
 import PolicyBank from "./pages/PolicyBank";
 import TestSuite from "./pages/TestSuite";
+import Playground from "./pages/Playground";
 import NotFound from "./pages/NotFound";
 
 // Learn pages
@@ -75,6 +76,9 @@ function AnimatedRoutes() {
           <Route path="/diff" element={<Diff />} />
           <Route path="/summary" element={<Summary />} />
           <Route path="/export" element={<Export />} />
+          
+          {/* Playground */}
+          <Route path="/playground" element={<Playground />} />
           
           {/* Spec & Tools */}
           <Route path="/spec" element={<Spec />} />
