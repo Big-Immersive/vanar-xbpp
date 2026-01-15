@@ -1,21 +1,34 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, FileText, Terminal, BookOpen, Library, PlayCircle, FlaskConical } from 'lucide-react';
+import { ArrowRight, FileText, Terminal, BookOpen, Library, PlayCircle, FlaskConical, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 
 export function HeroSection() {
   const [mounted, setMounted] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen]);
+
   const navLinks = [
-    { to: '/learn', label: 'Learn', icon: BookOpen },
-    { to: '/library', label: 'Library', icon: Library },
-    { to: '/playground', label: 'Playground', icon: PlayCircle },
-    { to: '/spec', label: 'Spec', icon: FileText },
-    { to: '/test-suite', label: 'Test Suite', icon: FlaskConical },
+    { to: '/learn', label: 'Learn', icon: BookOpen, description: 'Getting started guides' },
+    { to: '/library', label: 'Library', icon: Library, description: 'Policies, scenarios & more' },
+    { to: '/playground', label: 'Playground', icon: PlayCircle, description: 'Interactive demo' },
+    { to: '/spec', label: 'Spec', icon: FileText, description: 'Technical specification' },
+    { to: '/test-suite', label: 'Test Suite', icon: FlaskConical, description: 'Verification dashboard' },
   ];
 
   return (
@@ -48,17 +61,77 @@ export function HeroSection() {
               ))}
             </div>
 
-            {/* Mobile - Primary CTA */}
-            <Link
-              to="/playground"
-              className="md:hidden flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            {/* Mobile - Hamburger Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden flex items-center justify-center w-10 h-10 rounded-full border border-border/40 bg-background/80 backdrop-blur-md text-foreground hover:bg-muted/50 transition-colors"
+              aria-label="Open menu"
             >
-              <PlayCircle className="h-4 w-4" />
-              Playground
-            </Link>
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay */}
+      <div 
+        className={`fixed inset-0 z-[100] md:hidden transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+      >
+        {/* Backdrop */}
+        <div 
+          className="absolute inset-0 bg-background/90 backdrop-blur-md"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+        
+        {/* Menu Panel */}
+        <div 
+          className={`absolute top-0 right-0 h-full w-full max-w-sm bg-card border-l border-border/50 transition-transform duration-300 ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between p-6 border-b border-border/30">
+            <span className="text-sm font-mono font-medium tracking-[0.15em] uppercase text-foreground">
+              Menu
+            </span>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center w-10 h-10 rounded-full border border-border/40 bg-muted/30 text-foreground hover:bg-muted/50 transition-colors"
+              aria-label="Close menu"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          
+          {/* Nav Links */}
+          <div className="p-6 space-y-2">
+            {navLinks.map(({ to, label, icon: Icon, description }) => (
+              <Link
+                key={to}
+                to={to}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-start gap-4 p-4 rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted/30 transition-colors"
+              >
+                <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                  <Icon className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">{label}</p>
+                  <p className="text-sm text-muted-foreground">{description}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+          
+          {/* Bottom CTA */}
+          <div className="absolute bottom-0 left-0 right-0 p-6 border-t border-border/30">
+            <Button asChild size="lg" className="w-full">
+              <Link to="/playground" onClick={() => setMobileMenuOpen(false)}>
+                <PlayCircle className="mr-2 h-5 w-5" />
+                Try the Playground
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-4xl mx-auto text-center space-y-10 relative z-10 pt-16">
         {/* Tagline Badge */}
