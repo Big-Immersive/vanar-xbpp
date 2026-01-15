@@ -112,6 +112,7 @@ function CollapsibleSection({ title, children, defaultOpen = false }: { title: s
 export default function Spec() {
   const [activeSection, setActiveSection] = useState('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [simulatorConfig, setSimulatorConfig] = useState<PolicyConfig>({
     posture: 'BALANCED',
     maxSingle: 100,
@@ -124,6 +125,19 @@ export default function Spec() {
     minConfidence: 0.7,
     logLevel: 'STANDARD',
   });
+
+  // Scroll progress tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = scrollHeight > 0 ? (window.scrollY / scrollHeight) * 100 : 0;
+      setScrollProgress(Math.min(100, Math.max(0, progress)));
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Initial call
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Scroll-spy: track which section is visible
   useEffect(() => {
@@ -201,6 +215,14 @@ export default function Spec() {
 
   return (
     <div className="min-h-screen relative">
+      {/* Scroll Progress Bar */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-muted/30 z-50">
+        <div 
+          className="h-full bg-primary transition-all duration-150 ease-out"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
+      
       <AnimatedBackground variant="subtle" />
       
       {/* Mobile TOC Trigger */}
