@@ -41,7 +41,7 @@ export function ProblemSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="min-h-screen flex flex-col items-center justify-center px-6 py-24 relative">
+    <section ref={sectionRef} className="flex flex-col items-center justify-center px-6 py-20 md:py-28 relative">
       {/* Subtle warning undertone */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-escalate/[0.02] to-transparent pointer-events-none" />
       

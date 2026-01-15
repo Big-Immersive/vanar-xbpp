@@ -42,7 +42,7 @@ export function WhatIsSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="min-h-screen flex flex-col items-center justify-center px-6 py-24 relative">
+    <section ref={sectionRef} className="flex flex-col items-center justify-center px-6 py-20 md:py-28 relative">
       <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
         <div className="text-center mb-16">

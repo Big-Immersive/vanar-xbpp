@@ -26,7 +26,7 @@ export function FinalCTASection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-32 px-6 relative overflow-hidden">
+    <section ref={sectionRef} className="py-24 md:py-32 px-6 relative overflow-hidden">
       <div className={cn(
         "absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-1000",
         isVisible ? "opacity-100" : "opacity-0"

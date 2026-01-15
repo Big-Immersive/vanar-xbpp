@@ -55,7 +55,7 @@ export function WhyMattersSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="min-h-screen flex flex-col items-center justify-center px-6 py-24 relative">
+    <section ref={sectionRef} className="flex flex-col items-center justify-center px-6 py-20 md:py-28 relative">
       <div className="max-w-6xl mx-auto relative z-10 w-full">
         {/* Header */}
         <div className="text-center mb-16">

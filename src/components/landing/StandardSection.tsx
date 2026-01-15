@@ -33,7 +33,7 @@ export function StandardSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 px-6 relative">
+    <section ref={sectionRef} className="py-16 md:py-20 px-6 relative">
       {/* Document aesthetic background */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/30 to-transparent pointer-events-none" />
       

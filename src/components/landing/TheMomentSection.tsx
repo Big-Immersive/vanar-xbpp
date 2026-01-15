@@ -29,7 +29,7 @@ export function TheMomentSection() {
     <section 
       ref={sectionRef} 
       className={cn(
-        "min-h-screen flex flex-col items-center justify-center px-6 py-24 relative transition-colors duration-1000",
+        "flex flex-col items-center justify-center px-6 py-20 md:py-28 relative transition-colors duration-1000",
         phase >= 1 ? "bg-background" : "bg-card/50"
       )}
     >
