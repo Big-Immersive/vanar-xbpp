@@ -4,7 +4,7 @@
 export type Category = 'SPEND' | 'SIGN' | 'DEFENSE';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 export type DecisionType = 'ALLOW' | 'BLOCK' | 'ESCALATE';
-export type PolicyType = 'BPP' | 'DBP';
+export type PolicyType = 'BPP' | 'DBP' | 'xBPP';
 export type Posture = 'AGGRESSIVE' | 'BALANCED' | 'CAUTIOUS';
 export type Verification = 'NONE' | 'BUILT_IN' | 'CUSTOM';
 
@@ -144,6 +144,7 @@ export interface XBPPRateLimits {
 export interface XBPPConfidenceRules {
   require_confidence?: boolean;
   min_confidence?: number;
+  low_confidence_action?: 'ALLOW' | 'ESCALATE' | 'BLOCK';
 }
 
 // xBPP Audit Config
@@ -229,7 +230,7 @@ export interface Policy {
   constraints: Constraint[];
   raw_json: object;
   hash: string;
-  xbpp_policy?: XBPPPolicy; // Full xBPP policy structure
+  xbpp?: XBPPPolicy; // Full xBPP policy structure
 }
 
 export interface Decision {

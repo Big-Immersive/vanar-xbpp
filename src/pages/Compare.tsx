@@ -1,13 +1,12 @@
-import { useEffect } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowRight, ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { ArrowRight, ChevronDown, ChevronUp, Copy, Check, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePolicyLabStore } from '@/lib/store';
 import { getScenarioById } from '@/lib/data/scenarios';
-import { permissivePolicy, restrictivePolicy, getConstraintsForCategory } from '@/lib/data/policies';
-import { Category } from '@/lib/types';
+import { permissivePolicy, restrictivePolicy, getConstraintsForCategory, getPostureBadgeClass } from '@/lib/data/policies';
+import { Category, Posture } from '@/lib/types';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
 import { AnimatedBackground, GlowCard } from '@/components/effects';
 
 export default function Compare() {
@@ -123,6 +122,9 @@ function PolicyPanel({ policy, expanded, onToggleExpand, variant, scenarioCatego
   const uniqueConstraints = relevantConstraints.filter(c => !c.isShared);
   const sharedConstraints = relevantConstraints.filter(c => c.isShared);
   
+  // Get xBPP posture
+  const posture = policy.xbpp?.posture || (variant === 'permissive' ? 'AGGRESSIVE' : 'CAUTIOUS');
+  
   const handleCopyHash = () => {
     navigator.clipboard.writeText(policy.hash);
     setCopied(true);
@@ -130,7 +132,6 @@ function PolicyPanel({ policy, expanded, onToggleExpand, variant, scenarioCatego
   };
   
   const isPermissive = variant === 'permissive';
-  const accentColor = isPermissive ? 'allow' : 'escalate';
   
   return (
     <GlowCard 
@@ -138,20 +139,20 @@ function PolicyPanel({ policy, expanded, onToggleExpand, variant, scenarioCatego
       glowColor={isPermissive ? 'allow' : 'escalate'}
     >
       {/* Header */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex items-start justify-between mb-4">
         <div>
-          <span className={cn(
-            "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider mb-3",
-            isPermissive 
-              ? 'bg-allow/10 text-allow border border-allow/20' 
-              : 'bg-escalate/10 text-escalate border border-escalate/20'
-          )}>
+          <div className="flex items-center gap-2 mb-3">
             <span className={cn(
-              "w-1.5 h-1.5 rounded-full",
-              isPermissive ? 'bg-allow' : 'bg-escalate'
-            )} />
-            {policy.type}
-          </span>
+              "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider border",
+              getPostureBadgeClass(posture as Posture)
+            )}>
+              <Shield className="h-3 w-3" />
+              {posture}
+            </span>
+            <span className="px-2 py-0.5 rounded text-xs font-mono text-muted-foreground bg-muted/50">
+              {policy.type}
+            </span>
+          </div>
           <h3 className="text-2xl font-medium">{policy.name}</h3>
         </div>
         <button
@@ -167,15 +168,37 @@ function PolicyPanel({ policy, expanded, onToggleExpand, variant, scenarioCatego
         </button>
       </div>
       
-      {/* Posture */}
+      {/* Posture Summary */}
       <div className={cn(
-        "p-4 rounded-lg mb-8 border-l-2",
+        "p-4 rounded-lg mb-6 border-l-2",
         isPermissive ? 'bg-allow/5 border-allow/50' : 'bg-escalate/5 border-escalate/50'
       )}>
         <p className="text-muted-foreground italic text-lg">
           "{policy.posture_summary}"
         </p>
       </div>
+      
+      {/* xBPP Limits Summary */}
+      {policy.xbpp?.limits && (
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+            <p className="text-xs font-mono text-muted-foreground mb-1">MAX SINGLE</p>
+            <p className="font-mono font-medium">${policy.xbpp.limits.max_single?.toLocaleString()}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+            <p className="text-xs font-mono text-muted-foreground mb-1">MAX DAILY</p>
+            <p className="font-mono font-medium">${policy.xbpp.limits.max_daily?.toLocaleString()}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+            <p className="text-xs font-mono text-muted-foreground mb-1">HUMAN ABOVE</p>
+            <p className="font-mono font-medium">${policy.xbpp.limits.require_human_above?.toLocaleString()}</p>
+          </div>
+          <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+            <p className="text-xs font-mono text-muted-foreground mb-1">NEW VENDOR</p>
+            <p className="font-mono font-medium text-sm">{policy.xbpp.counterparty_rules?.new_counterparty_action || 'ALLOW'}</p>
+          </div>
+        </div>
+      )}
       
       {/* Unique Constraints (highlighted) */}
       <div className="space-y-3 mb-6">
@@ -222,18 +245,29 @@ function PolicyPanel({ policy, expanded, onToggleExpand, variant, scenarioCatego
       {/* JSON Toggle */}
       <button
         onClick={onToggleExpand}
-        className="flex items-center gap-2 mt-8 text-xs text-muted-foreground hover:text-foreground transition-colors group"
+        className="flex items-center gap-2 mt-6 text-xs text-muted-foreground hover:text-foreground transition-colors group"
       >
         {expanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-        <span className="group-hover:underline">{expanded ? 'Hide' : 'View'} policy JSON</span>
+        <span className="group-hover:underline">{expanded ? 'Hide' : 'View'} xBPP policy JSON</span>
       </button>
       
       {expanded && (
-        <pre className="mt-4 p-4 rounded-lg bg-background/80 text-xs font-mono overflow-x-auto border border-border max-h-64 overflow-y-auto">
-          <code className="text-muted-foreground">
-            {JSON.stringify(policy.raw_json, null, 2)}
-          </code>
-        </pre>
+        <div className="mt-4 rounded-lg bg-background/80 border border-border overflow-hidden">
+          <div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-border">
+            <span className="text-xs font-mono text-muted-foreground">xbpp-pay/v1.0</span>
+            <button
+              onClick={handleCopyHash}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Copy
+            </button>
+          </div>
+          <pre className="p-4 text-xs font-mono overflow-x-auto max-h-80 overflow-y-auto">
+            <code className="text-muted-foreground">
+              {JSON.stringify(policy.xbpp || policy.raw_json, null, 2)}
+            </code>
+          </pre>
+        </div>
       )}
     </GlowCard>
   );

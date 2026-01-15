@@ -192,31 +192,52 @@ function DecisionPanel({ policyName, policyHash, decision, reasonCodes, narrativ
     border: string;
     glow: string;
     badgeBg: string;
+    icon: string;
   }> = {
     ALLOW: { 
       bg: 'bg-allow/5', 
       text: 'text-allow', 
       border: 'border-allow/30',
       glow: 'shadow-[0_0_40px_-10px_hsl(var(--decision-allow)/0.4)]',
-      badgeBg: 'bg-allow/20'
+      badgeBg: 'bg-allow/20',
+      icon: '✓'
     },
     BLOCK: { 
       bg: 'bg-block/5', 
       text: 'text-block', 
       border: 'border-block/30',
       glow: 'shadow-[0_0_40px_-10px_hsl(var(--decision-block)/0.4)]',
-      badgeBg: 'bg-block/20'
+      badgeBg: 'bg-block/20',
+      icon: '✕'
     },
     ESCALATE: { 
       bg: 'bg-escalate/5', 
       text: 'text-escalate', 
       border: 'border-escalate/30',
       glow: 'shadow-[0_0_40px_-10px_hsl(var(--decision-escalate)/0.4)]',
-      badgeBg: 'bg-escalate/20'
+      badgeBg: 'bg-escalate/20',
+      icon: '⏸'
     },
   };
   
   const config = decisionConfig[decision];
+  
+  // Get reason code descriptions
+  const getReasonDescription = (code: string): string => {
+    const descriptions: Record<string, string> = {
+      'EXCEEDS_SINGLE_LIMIT': 'Value exceeds max_single',
+      'EXCEEDS_DAILY_LIMIT': 'Would exceed max_daily',
+      'HIGH_VALUE': 'Value exceeds require_human_above',
+      'NEW_COUNTERPARTY': 'First-time payment recipient',
+      'WITHIN_POLICY': 'All checks passed',
+      'BURST_DETECTED': 'Unusual transaction burst',
+      'LOW_CONFIDENCE': 'Agent confidence below threshold',
+      'DRAINER_CONTRACT': 'Known drainer contract detected',
+      'ADDRESS_POISONING': 'Address poisoning pattern',
+      'FRAGMENTATION_DETECTED': 'Possible split attack',
+    };
+    return descriptions[code] || code;
+  };
   
   return (
     <div className={cn(
@@ -226,49 +247,55 @@ function DecisionPanel({ policyName, policyHash, decision, reasonCodes, narrativ
       isRevealed && config.glow
     )}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-8">
+      <div className="flex items-start justify-between mb-6">
         <div>
           <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider mb-2">
             Policy {variant.toUpperCase()}
           </p>
           <h3 className="text-xl md:text-2xl font-medium">{policyName}</h3>
         </div>
-        <span className="font-mono text-xs text-muted-foreground/60">{policyHash}</span>
+        <span className="font-mono text-xs text-muted-foreground/60 bg-muted/30 px-2 py-1 rounded">{policyHash}</span>
       </div>
       
       {/* Decision badge - large and prominent */}
       <div className={cn(
-        "inline-flex px-6 py-3 rounded-full font-mono font-medium text-2xl mb-8 transition-all duration-500",
+        "inline-flex items-center gap-3 px-6 py-3 rounded-full font-mono font-medium text-2xl mb-6 transition-all duration-500",
         config.badgeBg,
         config.text,
         isRevealed && "animate-scale-in"
       )}>
+        <span>{config.icon}</span>
         {decision}
       </div>
       
-      {/* Reason codes */}
-      <div className="space-y-3 mb-8">
+      {/* Reason codes with descriptions */}
+      <div className="space-y-3 mb-6">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
-          Reason Codes
+          xBPP Reason Codes
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="space-y-2">
           {reasonCodes.map((code, i) => (
-            <span
+            <div
               key={i}
               className={cn(
-                "px-3 py-1.5 rounded-lg bg-background/50 text-xs font-mono border border-border/50",
+                "flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-border/50",
                 "transition-all duration-300"
               )}
               style={{ animationDelay: `${i * 100}ms` }}
             >
-              {code}
-            </span>
+              <span className={cn("font-mono text-xs px-2 py-0.5 rounded", config.badgeBg, config.text)}>
+                {code}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {getReasonDescription(code)}
+              </span>
+            </div>
           ))}
         </div>
       </div>
       
       {/* Narrative */}
-      <div className="border-l-2 border-border/50 pl-4">
+      <div className={cn("border-l-2 pl-4", config.border)}>
         <p className="text-muted-foreground italic text-lg leading-relaxed">
           "{narrative}"
         </p>

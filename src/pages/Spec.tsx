@@ -158,14 +158,38 @@ export default function Spec() {
                 <span>•</span>
                 <span>Apache 2.0</span>
               </div>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
-                  <BookOpen className="h-6 w-6 text-primary" />
+              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="p-3 rounded-lg bg-primary/10 border border-primary/20">
+                    <BookOpen className="h-6 w-6 text-primary" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl md:text-5xl font-medium">xBPP Specification</h1>
+                    <p className="text-lg text-muted-foreground mt-1">Behavioral Policy Protocol for Autonomous Agents</p>
+                  </div>
                 </div>
-                <div>
-                  <h1 className="text-4xl md:text-5xl font-medium">xBPP Specification</h1>
-                  <p className="text-lg text-muted-foreground mt-1">Behavioral Policy Protocol for Autonomous Agents</p>
-                </div>
+              </div>
+              
+              {/* Download Buttons */}
+              <div className="flex flex-wrap gap-3">
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/docs/xbpp-master-spec.md" download className="flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    Master Spec (1760 lines)
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/docs/xbpp-sdk-guide.md" download className="flex items-center gap-2">
+                    <Download className="h-4 w-4" />
+                    SDK Guide (810 lines)
+                  </a>
+                </Button>
+                <Button variant="ghost" size="sm" asChild>
+                  <a href="https://github.com/anthropic/xbpp" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    GitHub
+                  </a>
+                </Button>
               </div>
             </header>
 

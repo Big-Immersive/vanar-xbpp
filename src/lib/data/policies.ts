@@ -1,30 +1,67 @@
-import { Policy, Constraint } from '../types';
+import { Policy, Constraint, XBPPPolicy, Posture } from '../types';
 
-// Base shared constraints
-const sharedConstraints: Constraint[] = [
+// xBPP-compliant policy structures based on Master Specification v1.0
+
+// ============================================================================
+// PERMISSIVE POLICY (AGGRESSIVE Posture)
+// ============================================================================
+// Use case: Operations prioritizing speed and efficiency with basic guardrails
+
+const permissiveXBPP: XBPPPolicy = {
+  schema: 'xbpp-pay/v1.0',
+  version: '1',
+  posture: 'AGGRESSIVE',
+  limits: {
+    max_single: 10000,
+    max_daily: 50000,
+    max_weekly: 200000,
+    require_human_above: 25000,
+  },
+  verification: 'BUILT_IN',
+  counterparty_rules: {
+    new_counterparty_action: 'ALLOW',
+    require_verified: false,
+  },
+  value_rules: {
+    base_currency: 'USD',
+    accepted_currencies: ['USDC', 'USDT', 'ETH', 'BTC'],
+  },
+  rate_limits: {
+    max_per_minute: 20,
+    max_per_hour: 200,
+    burst_detection: false,
+  },
+  confidence_rules: {
+    min_confidence: 0.5,
+    low_confidence_action: 'ALLOW',
+  },
+  audit: {
+    log_level: 'STANDARD',
+    retention_days: 90,
+  },
+};
+
+const permissiveConstraints: Constraint[] = [
   {
     id: 'audit-log',
     name: 'Audit Logging',
-    description: 'All transactions must be logged with full context',
+    description: 'Standard logging with 90-day retention',
     type: 'require',
     isShared: true,
   },
   {
     id: 'rate-limit-base',
-    name: 'Base Rate Limit',
-    description: 'Maximum 100 transactions per hour',
+    name: 'Rate Limit',
+    description: 'Max 20/min, 200/hr - no burst detection',
     type: 'limit',
-    parameter: 100,
+    parameter: 200,
     isShared: true,
   },
-];
-
-// Spend-related constraints
-const spendConstraintsPermissive: Constraint[] = [
+  // SPEND constraints
   {
     id: 'spend-limit-permissive',
-    name: 'Transaction Limit',
-    description: 'Individual transactions up to $10,000 allowed',
+    name: 'Single Transaction Limit',
+    description: 'Up to $10,000 per transaction allowed',
     type: 'limit',
     parameter: 10000,
     category: 'SPEND',
@@ -38,28 +75,131 @@ const spendConstraintsPermissive: Constraint[] = [
     category: 'SPEND',
   },
   {
-    id: 'new-vendor-permissive',
-    name: 'New Vendor Policy',
-    description: 'Allow new vendors with basic verification',
-    type: 'require',
-    parameter: 'basic-verification',
+    id: 'human-threshold-permissive',
+    name: 'Human Approval Threshold',
+    description: 'Escalate only above $25,000',
+    type: 'escalate',
+    parameter: 25000,
     category: 'SPEND',
   },
   {
-    id: 'urgent-transfer-permissive',
-    name: 'Urgent Transfer Override',
-    description: 'Allow expedited transfers with executive approval signal',
+    id: 'new-vendor-permissive',
+    name: 'New Counterparty Policy',
+    description: 'Allow new vendors without verification',
     type: 'require',
-    parameter: 'executive-signal',
+    parameter: 'auto-allow',
     category: 'SPEND',
+  },
+  // SIGN constraints
+  {
+    id: 'signature-permissive',
+    name: 'Signature Threshold',
+    description: 'Single signature for amounts under $25,000',
+    type: 'limit',
+    parameter: 25000,
+    category: 'SIGN',
+  },
+  {
+    id: 'approval-chain-permissive',
+    name: 'Approval Chain',
+    description: 'Minimal approval for routine requests',
+    type: 'require',
+    parameter: 'minimal',
+    category: 'SIGN',
+  },
+  // DEFENSE constraints
+  {
+    id: 'confidence-permissive',
+    name: 'Confidence Threshold',
+    description: 'Allow low confidence (0.5+) actions',
+    type: 'limit',
+    parameter: 0.5,
+    category: 'DEFENSE',
+  },
+  {
+    id: 'verification-permissive',
+    name: 'Verification Mode',
+    description: 'Built-in verification, fail open',
+    type: 'require',
+    parameter: 'built-in',
+    category: 'DEFENSE',
   },
 ];
 
-const spendConstraintsRestrictive: Constraint[] = [
+export const permissivePolicy: Policy = {
+  id: 'policy-permissive-v1',
+  name: 'Aggressive Standard',
+  type: 'xBPP',
+  version: '1.0.0',
+  description: 'An aggressive policy that prioritizes speed and autonomy with basic safety guardrails. Favor action; minimize friction.',
+  posture_summary: 'Trust efficiency. Escalate only when necessary.',
+  constraints: permissiveConstraints,
+  raw_json: permissiveXBPP,
+  xbpp: permissiveXBPP,
+  hash: 'xbpp-agg-7a3f',
+};
+
+// ============================================================================
+// RESTRICTIVE POLICY (CAUTIOUS Posture)
+// ============================================================================
+// Use case: High-security operations with maximum oversight and verification
+
+const restrictiveXBPP: XBPPPolicy = {
+  schema: 'xbpp-pay/v1.0',
+  version: '1',
+  posture: 'CAUTIOUS',
+  limits: {
+    max_single: 1000,
+    max_daily: 5000,
+    max_weekly: 20000,
+    max_monthly: 50000,
+    require_human_above: 500,
+  },
+  verification: 'BUILT_IN',
+  counterparty_rules: {
+    new_counterparty_action: 'ESCALATE',
+    require_verified: true,
+  },
+  value_rules: {
+    base_currency: 'USD',
+    accepted_currencies: ['USDC', 'USDT'],
+  },
+  rate_limits: {
+    max_per_minute: 5,
+    max_per_hour: 50,
+    burst_detection: true,
+  },
+  confidence_rules: {
+    min_confidence: 0.9,
+    low_confidence_action: 'BLOCK',
+  },
+  audit: {
+    log_level: 'VERBOSE',
+    retention_days: 2555,
+  },
+};
+
+const restrictiveConstraints: Constraint[] = [
+  {
+    id: 'audit-log',
+    name: 'Audit Logging',
+    description: 'Verbose logging with 7-year retention',
+    type: 'require',
+    isShared: true,
+  },
+  {
+    id: 'rate-limit-base',
+    name: 'Rate Limit',
+    description: 'Max 5/min, 50/hr - burst detection ON',
+    type: 'limit',
+    parameter: 50,
+    isShared: true,
+  },
+  // SPEND constraints
   {
     id: 'spend-limit-restrictive',
-    name: 'Transaction Limit',
-    description: 'Individual transactions up to $1,000 allowed',
+    name: 'Single Transaction Limit',
+    description: 'Maximum $1,000 per transaction',
     type: 'limit',
     parameter: 1000,
     category: 'SPEND',
@@ -73,60 +213,30 @@ const spendConstraintsRestrictive: Constraint[] = [
     category: 'SPEND',
   },
   {
+    id: 'human-threshold-restrictive',
+    name: 'Human Approval Threshold',
+    description: 'Escalate all transactions over $500',
+    type: 'escalate',
+    parameter: 500,
+    category: 'SPEND',
+  },
+  {
     id: 'new-vendor-restrictive',
-    name: 'New Vendor Policy',
-    description: 'Require human approval for all new vendors',
+    name: 'New Counterparty Policy',
+    description: 'Require human approval for new vendors',
     type: 'escalate',
     parameter: 'human-approval',
     category: 'SPEND',
   },
   {
-    id: 'urgent-transfer-restrictive',
-    name: 'Urgent Transfer Override',
-    description: 'No expedited transfers without full approval chain',
-    type: 'deny',
-    parameter: 'full-chain-required',
-    category: 'SPEND',
-  },
-  {
     id: 'velocity-check',
-    name: 'Velocity Check',
-    description: 'Flag unusual transaction patterns',
-    type: 'require',
-    parameter: 'pattern-analysis',
+    name: 'Velocity Monitoring',
+    description: 'Flag and block unusual transaction patterns',
+    type: 'deny',
+    parameter: 'burst-detection',
     category: 'SPEND',
   },
-];
-
-// Sign-related constraints
-const signConstraintsPermissive: Constraint[] = [
-  {
-    id: 'signature-permissive',
-    name: 'Signature Threshold',
-    description: 'Single signature for amounts under $25,000',
-    type: 'limit',
-    parameter: 25000,
-    category: 'SIGN',
-  },
-  {
-    id: 'approval-chain-permissive',
-    name: 'Approval Chain',
-    description: 'Standard approval for routine requests',
-    type: 'require',
-    parameter: 'standard-flow',
-    category: 'SIGN',
-  },
-  {
-    id: 'signer-verification-permissive',
-    name: 'Signer Verification',
-    description: 'Basic identity verification for known signers',
-    type: 'require',
-    parameter: 'basic-identity',
-    category: 'SIGN',
-  },
-];
-
-const signConstraintsRestrictive: Constraint[] = [
+  // SIGN constraints
   {
     id: 'signature-restrictive',
     name: 'Signature Threshold',
@@ -138,155 +248,57 @@ const signConstraintsRestrictive: Constraint[] = [
   {
     id: 'approval-chain-restrictive',
     name: 'Approval Chain',
-    description: 'Full verification for all approval requests',
+    description: 'Full verification required for all requests',
     type: 'escalate',
-    parameter: 'full-verification',
+    parameter: 'full-chain',
     category: 'SIGN',
   },
   {
-    id: 'signer-verification-restrictive',
-    name: 'Signer Verification',
-    description: 'Multi-factor authentication for all signers',
-    type: 'require',
-    parameter: 'mfa-required',
-    category: 'SIGN',
-  },
-  {
-    id: 'phantom-detection-restrictive',
-    name: 'Phantom Request Detection',
-    description: 'Detect and block requests from unverified sources',
+    id: 'verified-only',
+    name: 'Verified Recipients Only',
+    description: 'Block unverified counterparties',
     type: 'deny',
-    parameter: 'source-verification',
+    parameter: 'verified-required',
     category: 'SIGN',
   },
-];
-
-// Defense-related constraints  
-const defenseConstraintsPermissive: Constraint[] = [
+  // DEFENSE constraints
   {
-    id: 'access-pattern-permissive',
-    name: 'Access Pattern Monitoring',
-    description: 'Log unusual access patterns for review',
-    type: 'require',
-    parameter: 'logging-only',
-    category: 'DEFENSE',
-  },
-  {
-    id: 'data-access-permissive',
-    name: 'Data Access Scope',
-    description: 'Allow broad read access for operational efficiency',
+    id: 'confidence-restrictive',
+    name: 'Confidence Threshold',
+    description: 'Block low confidence (< 0.9) actions',
     type: 'limit',
-    parameter: 'broad-read',
+    parameter: 0.9,
     category: 'DEFENSE',
   },
   {
-    id: 'insider-trust-permissive',
-    name: 'Insider Access Policy',
-    description: 'Trust internal actors with standard permissions',
+    id: 'verification-restrictive',
+    name: 'Verification Mode',
+    description: 'Built-in verification, fail closed',
     type: 'require',
-    parameter: 'standard-trust',
+    parameter: 'fail-closed',
+    category: 'DEFENSE',
+  },
+  {
+    id: 'threat-detection',
+    name: 'Threat Detection',
+    description: 'Block drainer contracts, poisoning, honeypots',
+    type: 'deny',
+    parameter: 'full-threat-detection',
     category: 'DEFENSE',
   },
 ];
-
-const defenseConstraintsRestrictive: Constraint[] = [
-  {
-    id: 'access-pattern-restrictive',
-    name: 'Access Pattern Monitoring',
-    description: 'Block and alert on unusual access patterns',
-    type: 'deny',
-    parameter: 'active-blocking',
-    category: 'DEFENSE',
-  },
-  {
-    id: 'data-access-restrictive',
-    name: 'Data Access Scope',
-    description: 'Restrict access to minimum necessary data',
-    type: 'limit',
-    parameter: 'minimal-access',
-    category: 'DEFENSE',
-  },
-  {
-    id: 'insider-trust-restrictive',
-    name: 'Insider Access Policy',
-    description: 'Verify all internal actors on each request',
-    type: 'escalate',
-    parameter: 'zero-trust',
-    category: 'DEFENSE',
-  },
-  {
-    id: 'exfiltration-detection-restrictive',
-    name: 'Exfiltration Detection',
-    description: 'Block systematic data retrieval patterns',
-    type: 'deny',
-    parameter: 'pattern-block',
-    category: 'DEFENSE',
-  },
-  {
-    id: 'suggestion-filter-restrictive',
-    name: 'Suggestion Filtering',
-    description: 'Verify external suggestions against known-good sources',
-    type: 'require',
-    parameter: 'source-verification',
-    category: 'DEFENSE',
-  },
-];
-
-export const permissivePolicy: Policy = {
-  id: 'policy-permissive-v1',
-  name: 'Permissive Standard',
-  type: 'BPP',
-  version: '1.0.0',
-  description: 'A balanced policy that prioritizes operational efficiency while maintaining basic safety guardrails.',
-  posture_summary: 'Trust efficiency. Escalate only when necessary.',
-  constraints: [
-    ...sharedConstraints,
-    ...spendConstraintsPermissive,
-    ...signConstraintsPermissive,
-    ...defenseConstraintsPermissive,
-  ],
-  raw_json: {
-    version: '1.0.0',
-    type: 'BPP',
-    posture: 'permissive',
-    rules: {
-      transaction_limit: 10000,
-      daily_aggregate: 50000,
-      new_vendor: 'allow_with_basic_verification',
-      signature_threshold: 25000,
-      escalation_trigger: 'high_risk_only',
-    },
-  },
-  hash: 'bpp-7a3f9c2e',
-};
 
 export const restrictivePolicy: Policy = {
   id: 'policy-restrictive-v1',
-  name: 'Restrictive Standard',
-  type: 'DBP',
+  name: 'Cautious Standard',
+  type: 'xBPP',
   version: '1.0.0',
-  description: 'A cautious policy that prioritizes verification and human oversight for all significant decisions.',
+  description: 'A cautious policy that prioritizes verification and human oversight for all significant decisions. Favor safety; maximize oversight.',
   posture_summary: 'Verify everything. Ask when uncertain.',
-  constraints: [
-    ...sharedConstraints,
-    ...spendConstraintsRestrictive,
-    ...signConstraintsRestrictive,
-    ...defenseConstraintsRestrictive,
-  ],
-  raw_json: {
-    version: '1.0.0',
-    type: 'DBP',
-    posture: 'restrictive',
-    rules: {
-      transaction_limit: 1000,
-      daily_aggregate: 5000,
-      new_vendor: 'require_human_approval',
-      signature_threshold: 500,
-      velocity_check: true,
-      escalation_trigger: 'any_uncertainty',
-    },
-  },
-  hash: 'dbp-2b8e4d1f',
+  constraints: restrictiveConstraints,
+  raw_json: restrictiveXBPP,
+  xbpp: restrictiveXBPP,
+  hash: 'xbpp-cau-2b8e',
 };
 
 export const policies: Policy[] = [permissivePolicy, restrictivePolicy];
@@ -298,4 +310,22 @@ export function getPolicyById(id: string): Policy | undefined {
 // Get constraints relevant to a specific scenario category
 export function getConstraintsForCategory(policy: Policy, category: 'SPEND' | 'SIGN' | 'DEFENSE'): Constraint[] {
   return policy.constraints.filter(c => c.category === category || c.isShared);
+}
+
+// Helper to get posture color class
+export function getPostureColor(posture: Posture): string {
+  switch (posture) {
+    case 'AGGRESSIVE': return 'text-escalate';
+    case 'BALANCED': return 'text-primary';
+    case 'CAUTIOUS': return 'text-allow';
+  }
+}
+
+// Helper to get posture badge class
+export function getPostureBadgeClass(posture: Posture): string {
+  switch (posture) {
+    case 'AGGRESSIVE': return 'bg-escalate/10 text-escalate border-escalate/30';
+    case 'BALANCED': return 'bg-primary/10 text-primary border-primary/30';
+    case 'CAUTIOUS': return 'bg-allow/10 text-allow border-allow/30';
+  }
 }
