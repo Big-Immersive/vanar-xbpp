@@ -12,11 +12,12 @@ import {
   Zap,
   Shield,
   PenTool,
-  Filter,
   Download,
   FileJson,
-  FileSpreadsheet
+  FileSpreadsheet,
+  TrendingUp
 } from 'lucide-react';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -25,10 +26,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { scenarios } from '@/lib/data/scenarios';
 import { evaluateTransaction, getDefaultTransactionInput, getPostureDefaults, ExtendedPolicyConfig } from '@/lib/xbppEvaluator';
 import { Posture, Category, ReasonCode } from '@/lib/types';
 import { cn } from '@/lib/utils';
+
+const VERDICT_COLORS = {
+  ALLOW: '#4ade80',
+  BLOCK: '#f87171', 
+  ESCALATE: '#fbbf24',
+};
+
+const POSTURE_COLORS = {
+  CAUTIOUS: '#4ade80',
+  BALANCED: '#60a5fa',
+  AGGRESSIVE: '#f97316',
+};
 
 interface TestResult {
   scenarioId: string;
@@ -56,51 +70,53 @@ const categoryIcons: Record<Category, React.ReactNode> = {
   DEFENSE: <Shield className="h-4 w-4" />,
 };
 
-// Map scenarios to transaction inputs for realistic testing
+// Map scenarios to transaction inputs for realistic testing based on xBPP context
 function scenarioToTransactionInput(scenario: typeof scenarios[0]) {
   const base = getDefaultTransactionInput();
-  
-  // Extract context from scenario
-  const events = scenario.event_stream || [];
-  const narrative = scenario.narrative?.toLowerCase() || '';
   const name = scenario.name?.toLowerCase() || '';
+  const narrative = scenario.narrative?.toLowerCase() || '';
+  const xbpp = scenario.xbpp_context;
   
-  const hasHighValue = name.includes('drain') || name.includes('override') || narrative.includes('large');
-  const hasSecurityThreat = name.includes('attack') || name.includes('honeypot') || name.includes('malicious');
-  const hasNewCounterparty = name.includes('new') || name.includes('vendor') || narrative.includes('unknown');
+  // Scenario-specific mappings for accurate simulation
+  const scenarioMappings: Record<string, Partial<typeof base>> = {
+    'scenario-new-vendor': { isNewCounterparty: true, amount: 6200, confidence: 0.6 },
+    'scenario-slow-drain': { amount: 1800, dailySpent: 3510, actionsToday: 18 },
+    'scenario-convincing-signature': { amount: 45000, confidence: 0.7, phishingSignature: false },
+    'scenario-poisoned-address': { addressPoisoning: true, amount: 22000 },
+    'scenario-phantom-approval': { amount: 180000, isVerified: true },
+    'scenario-trusted-insider': { amount: 0, confidence: 0.95 },
+    'scenario-urgent-override': { amount: 2400000, confidence: 0.94 },
+    'scenario-copy-paste-error': { unverifiedContract: true, contractAgeHours: 3 },
+    'scenario-silent-listener': { amount: 0, actionsThisMinute: 15 },
+    'scenario-fragmented-attack': { recentActionsToSameAddress: 47, amount: 2000 },
+    'scenario-honeypot-token': { honeypotToken: true, amount: 12000 },
+    'scenario-gas-spike': { gasEstimate: 847, gasMaxWilling: 100 },
+    'scenario-bridge-request': { isBridge: true, isCrossChain: true, amount: 50000 },
+    'scenario-recursive-approval': { amount: 0, adminKeyDetected: true },
+    'scenario-rate-limit-breach': { actionsThisMinute: 150, actionsThisHour: 2000 },
+    'scenario-stale-oracle': { confidence: 0.4, amount: 25000 },
+    'scenario-runaway-gpu': { amount: 12000, dailySpent: 8000 },
+    'scenario-social-engineer': { drainerContract: true, confidence: 0.3, amount: 47500 },
+    'scenario-coordination-bug': { isAgentToAgent: true, amount: 340 },
+    'scenario-agent-hiring-agent': { isAgentToAgent: true, amount: 180 },
+    'scenario-api-runaway': { actionsThisMinute: 100, dailySpent: 1200, amount: 500 },
+    'scenario-recurring-surprise': { isRecurring: true, recurringVariance: 2.02, amount: 299 },
+  };
   
-  // Adjust based on scenario category and narrative
-  switch (scenario.category) {
-    case 'SPEND':
-      return {
-        ...base,
-        amount: hasHighValue ? 15000 : 500,
-        dailySpent: hasHighValue ? 20000 : 1000,
-        weeklySpent: hasHighValue ? 50000 : 5000,
-        isNewCounterparty: hasNewCounterparty,
-        confidence: hasNewCounterparty ? 0.5 : 0.9,
-        drainerContract: hasSecurityThreat,
-        gasEstimate: name.includes('gas') ? 800 : 50,
-      };
-    case 'SIGN':
-      return {
-        ...base,
-        amount: 0,
-        isNewCounterparty: true,
-        isVerified: !hasSecurityThreat,
-        confidence: hasSecurityThreat ? 0.3 : 0.8,
-        phishingSignature: hasSecurityThreat,
-      };
-    case 'DEFENSE':
-      return {
-        ...base,
-        drainerContract: hasSecurityThreat,
-        addressPoisoning: name.includes('poison'),
-        honeypotToken: name.includes('honeypot'),
-      };
-    default:
-      return base;
-  }
+  const specificMapping = scenarioMappings[scenario.id] || {};
+  
+  // Category-based defaults
+  const categoryDefaults: Record<Category, Partial<typeof base>> = {
+    SPEND: { amount: 500 },
+    SIGN: { amount: 0 },
+    DEFENSE: { drainerContract: name.includes('attack') || name.includes('honeypot') },
+  };
+  
+  return {
+    ...base,
+    ...categoryDefaults[scenario.category],
+    ...specificMapping,
+  };
 }
 
 // Determine expected verdict based on scenario nature
@@ -451,111 +467,221 @@ export default function TestSuite() {
           </CardContent>
         </Card>
 
-        {/* Summary Dashboard */}
+        {/* Visual Charts Dashboard */}
         {results.length > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+            className="mb-8"
           >
-            {/* Overall Stats */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-primary mb-1">
-                    {Math.round(
-                      (results.reduce((acc, r) => acc + r.passedCount, 0) /
-                        results.reduce((acc, r) => acc + r.results.length, 0)) *
-                        100
-                    )}%
-                  </div>
-                  <p className="text-sm text-muted-foreground">Overall Pass Rate</p>
-                </div>
-              </CardContent>
-            </Card>
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="mb-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="verdicts">Verdict Analysis</TabsTrigger>
+                <TabsTrigger value="postures">Posture Comparison</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="overview">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {/* Overall Pass Rate */}
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-primary mb-1">
+                          {Math.round(
+                            (results.reduce((acc, r) => acc + r.passedCount, 0) /
+                              results.reduce((acc, r) => acc + r.results.length, 0)) *
+                              100
+                          )}%
+                        </div>
+                        <p className="text-sm text-muted-foreground">Overall Pass Rate</p>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            {/* Verdict Distribution */}
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3 text-center">
-                  Verdict Distribution
-                </p>
-                <div className="flex justify-center gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-400">
-                      {results.reduce((acc, r) => acc + r.results.filter(x => x.verdict === 'ALLOW').length, 0)}
-                    </div>
-                    <p className="text-xs text-muted-foreground">ALLOW</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-red-400">
-                      {results.reduce((acc, r) => acc + r.results.filter(x => x.verdict === 'BLOCK').length, 0)}
-                    </div>
-                    <p className="text-xs text-muted-foreground">BLOCK</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-amber-400">
-                      {results.reduce((acc, r) => acc + r.results.filter(x => x.verdict === 'ESCALATE').length, 0)}
-                    </div>
-                    <p className="text-xs text-muted-foreground">ESCALATE</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  {/* Total Tests */}
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold mb-1">
+                          {results.reduce((acc, r) => acc + r.results.length, 0)}
+                        </div>
+                        <p className="text-sm text-muted-foreground">Total Tests Run</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {scenarios.length} scenarios × {results.length} posture{results.length > 1 ? 's' : ''}
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            {/* Category Breakdown */}
-            <Card>
-              <CardContent className="pt-6">
-                <p className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3 text-center">
-                  By Category
-                </p>
-                <div className="flex justify-center gap-4">
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <Zap className="h-4 w-4 text-primary" />
-                      <span className="text-lg font-bold">
-                        {results.reduce((acc, r) => acc + r.results.filter(x => x.category === 'SPEND').length, 0)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">SPEND</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <PenTool className="h-4 w-4 text-primary" />
-                      <span className="text-lg font-bold">
-                        {results.reduce((acc, r) => acc + r.results.filter(x => x.category === 'SIGN').length, 0)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">SIGN</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <Shield className="h-4 w-4 text-primary" />
-                      <span className="text-lg font-bold">
-                        {results.reduce((acc, r) => acc + r.results.filter(x => x.category === 'DEFENSE').length, 0)}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">DEFENSE</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  {/* Blocks / Escalates */}
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="flex justify-center gap-6">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-red-400">
+                            {results.reduce((acc, r) => acc + r.results.filter(x => x.verdict === 'BLOCK').length, 0)}
+                          </div>
+                          <p className="text-xs text-muted-foreground">Blocked</p>
+                        </div>
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-amber-400">
+                            {results.reduce((acc, r) => acc + r.results.filter(x => x.verdict === 'ESCALATE').length, 0)}
+                          </div>
+                          <p className="text-xs text-muted-foreground">Escalated</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            {/* Total Runtime */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-muted-foreground mb-1">
-                    {results.reduce((acc, r) => acc + r.runTime, 0).toFixed(0)}
-                    <span className="text-lg">ms</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">Total Runtime</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {results.reduce((acc, r) => acc + r.results.length, 0)} tests across {results.length} posture{results.length > 1 ? 's' : ''}
-                  </p>
+                  {/* Runtime */}
+                  <Card>
+                    <CardContent className="pt-6">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold text-muted-foreground mb-1">
+                          {results.reduce((acc, r) => acc + r.runTime, 0).toFixed(0)}
+                          <span className="text-lg">ms</span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Total Runtime</p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+              </TabsContent>
+              
+              <TabsContent value="verdicts">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Verdict Pie Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <TrendingUp className="h-5 w-5" />
+                        Verdict Distribution
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <PieChart>
+                          <Pie
+                            data={[
+                              { name: 'ALLOW', value: results.reduce((acc, r) => acc + r.results.filter(x => x.verdict === 'ALLOW').length, 0) },
+                              { name: 'BLOCK', value: results.reduce((acc, r) => acc + r.results.filter(x => x.verdict === 'BLOCK').length, 0) },
+                              { name: 'ESCALATE', value: results.reduce((acc, r) => acc + r.results.filter(x => x.verdict === 'ESCALATE').length, 0) },
+                            ]}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={90}
+                            paddingAngle={3}
+                            dataKey="value"
+                            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                          >
+                            <Cell fill={VERDICT_COLORS.ALLOW} />
+                            <Cell fill={VERDICT_COLORS.BLOCK} />
+                            <Cell fill={VERDICT_COLORS.ESCALATE} />
+                          </Pie>
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  {/* Category Bar Chart */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Verdicts by Category</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <BarChart
+                          data={(['SPEND', 'SIGN', 'DEFENSE'] as Category[]).map(cat => ({
+                            category: cat,
+                            ALLOW: results.reduce((acc, r) => acc + r.results.filter(x => x.category === cat && x.verdict === 'ALLOW').length, 0),
+                            BLOCK: results.reduce((acc, r) => acc + r.results.filter(x => x.category === cat && x.verdict === 'BLOCK').length, 0),
+                            ESCALATE: results.reduce((acc, r) => acc + r.results.filter(x => x.category === cat && x.verdict === 'ESCALATE').length, 0),
+                          }))}
+                        >
+                          <XAxis dataKey="category" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                          <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                          />
+                          <Legend />
+                          <Bar dataKey="ALLOW" stackId="a" fill={VERDICT_COLORS.ALLOW} />
+                          <Bar dataKey="BLOCK" stackId="a" fill={VERDICT_COLORS.BLOCK} />
+                          <Bar dataKey="ESCALATE" stackId="a" fill={VERDICT_COLORS.ESCALATE} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="postures">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Posture Pass Rates */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Pass Rate by Posture</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <BarChart
+                          data={results.map(r => ({
+                            posture: r.posture,
+                            'Pass Rate': Math.round((r.passedCount / r.results.length) * 100),
+                          }))}
+                          layout="vertical"
+                        >
+                          <XAxis type="number" domain={[0, 100]} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                          <YAxis dataKey="posture" type="category" width={100} tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                            formatter={(value) => [`${value}%`, 'Pass Rate']}
+                          />
+                          <Bar dataKey="Pass Rate" radius={[0, 4, 4, 0]}>
+                            {results.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={POSTURE_COLORS[entry.posture]} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+
+                  {/* Posture Verdict Breakdown */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Verdict Breakdown by Posture</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ResponsiveContainer width="100%" height={250}>
+                        <BarChart
+                          data={results.map(r => ({
+                            posture: r.posture,
+                            ALLOW: r.results.filter(x => x.verdict === 'ALLOW').length,
+                            BLOCK: r.results.filter(x => x.verdict === 'BLOCK').length,
+                            ESCALATE: r.results.filter(x => x.verdict === 'ESCALATE').length,
+                          }))}
+                        >
+                          <XAxis dataKey="posture" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                          <YAxis tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                          <Tooltip 
+                            contentStyle={{ backgroundColor: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}
+                          />
+                          <Legend />
+                          <Bar dataKey="ALLOW" fill={VERDICT_COLORS.ALLOW} />
+                          <Bar dataKey="BLOCK" fill={VERDICT_COLORS.BLOCK} />
+                          <Bar dataKey="ESCALATE" fill={VERDICT_COLORS.ESCALATE} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
           </motion.div>
         )}
 
