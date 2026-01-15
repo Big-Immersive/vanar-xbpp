@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Download, FileJson, Shield, Zap, AlertTriangle, ExternalLink, Sparkles, Play, List, FlaskConical } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
 import { Button } from '@/components/ui/button';
@@ -122,6 +122,38 @@ export default function Spec() {
     minConfidence: 0.7,
     logLevel: 'STANDARD',
   });
+
+  // Scroll-spy: track which section is visible
+  useEffect(() => {
+    const sectionIds = tocSections.map(s => s.id);
+    const observers: IntersectionObserver[] = [];
+
+    sectionIds.forEach((id) => {
+      const element = document.getElementById(id);
+      if (!element) return;
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setActiveSection(id);
+            }
+          });
+        },
+        {
+          rootMargin: '-20% 0px -70% 0px', // Trigger when section is in upper portion of viewport
+          threshold: 0,
+        }
+      );
+
+      observer.observe(element);
+      observers.push(observer);
+    });
+
+    return () => {
+      observers.forEach((observer) => observer.disconnect());
+    };
+  }, []);
 
   const scrollToSection = (id: string) => {
     setActiveSection(id);
