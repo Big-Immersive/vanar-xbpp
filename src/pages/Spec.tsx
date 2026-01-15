@@ -1,12 +1,13 @@
 import { useState } from 'react';
-import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Download, FileJson, Shield, Zap, AlertTriangle, ExternalLink, Sparkles, Play } from 'lucide-react';
+import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Download, FileJson, Shield, Zap, AlertTriangle, ExternalLink, Sparkles, Play, List } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { PolicyBuilder } from '@/components/spec/PolicyBuilder';
-import { VerdictSimulator } from '@/components/spec/VerdictSimulator';
-import { PolicyConfig } from '@/lib/types';
+import { AdvancedVerdictSimulator } from '@/components/spec/AdvancedVerdictSimulator';
+import { ReasonCodeReference } from '@/components/spec/ReasonCodeReference';
+import type { PolicyConfig } from '@/lib/types';
 
 const tocSections = [
   { id: 'overview', title: 'Overview', icon: BookOpen },
@@ -14,9 +15,9 @@ const tocSections = [
   { id: 'key-concepts', title: 'Key Concepts', icon: FileJson },
   { id: 'policy-builder', title: 'Policy Builder', icon: Sparkles },
   { id: 'verdict-simulator', title: 'Verdict Simulator', icon: Play },
+  { id: 'reason-codes', title: 'Reason Codes', icon: List },
   { id: 'policy-structure', title: 'Policy Structure', icon: Shield },
   { id: 'postures', title: 'Postures', icon: AlertTriangle },
-  { id: 'reason-codes', title: 'Reason Codes', icon: FileJson },
   { id: 'default-policies', title: 'Default Policies', icon: Shield },
   { id: 'sdk', title: 'SDK Integration', icon: Zap },
 ];
@@ -371,14 +372,28 @@ export default function Spec() {
             <section id="verdict-simulator" className="mb-16 scroll-mt-28">
               <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
                 <Play className="h-6 w-6 text-primary" />
-                Verdict Simulator
+                Advanced Verdict Simulator
               </h2>
               
               <p className="text-muted-foreground mb-6">
-                Test how your policy evaluates transactions in real-time. Enter transaction details to see the verdict and reason codes.
+                Test the full xBPP 9-phase evaluation sequence. Configure transaction details including chain rules, security threats, rate limits, and more to see how your policy responds.
               </p>
               
-              <VerdictSimulator config={simulatorConfig} />
+              <AdvancedVerdictSimulator config={simulatorConfig} />
+            </section>
+
+            {/* Reason Codes Reference */}
+            <section id="reason-codes" className="mb-16 scroll-mt-28">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+                <List className="h-6 w-6 text-primary" />
+                Reason Codes Reference
+              </h2>
+              
+              <p className="text-muted-foreground mb-6">
+                Complete reference of all 45+ xBPP reason codes. Filter by category or decision type to find specific codes.
+              </p>
+              
+              <ReasonCodeReference />
             </section>
 
             {/* Policy Structure */}
@@ -468,75 +483,6 @@ export default function Spec() {
               </div>
             </section>
 
-            {/* Reason Codes */}
-            <section id="reason-codes" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
-                <FileJson className="h-6 w-6 text-primary" />
-                Reason Codes
-              </h2>
-              
-              <p className="text-muted-foreground mb-6">
-                Every decision is accompanied by machine-readable reason codes that explain the policy evaluation.
-              </p>
-              
-              <CollapsibleSection title="Core Reason Codes" defaultOpen>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-border">
-                        <th className="text-left py-2 pr-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Code</th>
-                        <th className="text-left py-2 pr-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Decision</th>
-                        <th className="text-left py-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">Description</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {coreReasonCodes.map(({ code, decision, description }) => (
-                        <tr key={code}>
-                          <td className="py-2 pr-4 font-mono text-primary text-xs">{code}</td>
-                          <td className={cn(
-                            "py-2 pr-4 font-mono text-xs",
-                            decision === 'BLOCK' && 'text-block',
-                            decision === 'ESCALATE' && 'text-escalate',
-                            decision === 'varies' && 'text-muted-foreground'
-                          )}>{decision}</td>
-                          <td className="py-2 text-muted-foreground">{description}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CollapsibleSection>
-              
-              <div className="mt-4">
-                <CollapsibleSection title="xBPP-pay Extended Reason Codes">
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b border-border">
-                          <th className="text-left py-2 pr-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Code</th>
-                          <th className="text-left py-2 pr-4 font-mono text-xs uppercase tracking-wider text-muted-foreground">Decision</th>
-                          <th className="text-left py-2 font-mono text-xs uppercase tracking-wider text-muted-foreground">Description</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {payReasonCodes.map(({ code, decision, description }) => (
-                          <tr key={code}>
-                            <td className="py-2 pr-4 font-mono text-primary text-xs">{code}</td>
-                            <td className={cn(
-                              "py-2 pr-4 font-mono text-xs",
-                              decision === 'BLOCK' && 'text-block',
-                              decision === 'ESCALATE' && 'text-escalate',
-                              decision === 'varies' && 'text-muted-foreground'
-                            )}>{decision}</td>
-                            <td className="py-2 text-muted-foreground">{description}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CollapsibleSection>
-              </div>
-            </section>
 
             {/* Default Policies */}
             <section id="default-policies" className="mb-16 scroll-mt-28">
