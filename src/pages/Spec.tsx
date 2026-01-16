@@ -274,7 +274,7 @@ export default function Spec() {
                   </div>
                   <div>
                     <h1 className="text-4xl md:text-5xl font-medium">xBPP Specification</h1>
-                    <p className="text-lg text-muted-foreground mt-1">Behavioral Policy Protocol for Autonomous Agents</p>
+                    <p className="text-lg text-muted-foreground mt-1">Execution Boundary Permission Protocol for Autonomous Agents</p>
                   </div>
                 </div>
               </div>
@@ -311,7 +311,7 @@ export default function Spec() {
               
               <div className="prose prose-invert max-w-none space-y-6">
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  xBPP (Behavioral Policy Protocol) is an open standard that lets autonomous AI agents make payments safely. 
+                  xBPP (Execution Boundary Permission Protocol) is an open standard that lets autonomous AI agents make payments safely.
                   It answers a simple question: <span className="text-foreground font-medium">"Should this agent be allowed to spend this money?"</span>
                 </p>
                 

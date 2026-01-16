@@ -63,7 +63,7 @@ export function WhatIsSection() {
             "text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-6 transition-all duration-500 delay-100",
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           )}>
-            <span className="text-primary">xBPP</span>: Behavioral Policy Protocol
+            <span className="text-primary">xBPP</span>: Execution Boundary Permission Protocol
           </h2>
           <p className={cn(
             "text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto transition-all duration-500 delay-200",

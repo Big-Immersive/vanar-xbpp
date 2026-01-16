@@ -1,5 +1,5 @@
 // xBPP Spec-Compliant Transaction Evaluator
-// Implements the 9-phase evaluation sequence from the xBPP Master Specification v1.0
+// Implements the 9-phase evaluation sequence from the xBPP (Execution Boundary Permission Protocol) Master Specification v1.0
 
 import { PolicyConfig, Posture, DecisionType, ReasonCode } from './types';
 

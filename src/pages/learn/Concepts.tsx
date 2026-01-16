@@ -85,7 +85,7 @@ export default function Concepts() {
             How xBPP Works
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
-            Understand the building blocks of behavioral policy.
+            Understand the building blocks of execution boundary policy.
           </p>
         </header>
         

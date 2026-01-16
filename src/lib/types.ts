@@ -1,5 +1,5 @@
 // BPPLAB Core Object Model
-// Aligned with xBPP (Behavioral Policy Protocol) Master Specification v1.0
+// Aligned with xBPP (Execution Boundary Permission Protocol) Master Specification v1.0
 
 export type Category = 'SPEND' | 'SIGN' | 'DEFENSE';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';

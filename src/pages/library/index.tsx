@@ -56,7 +56,7 @@ export default function LibraryIndex() {
         <header className="mb-12 text-center">
           <p className="text-sm font-mono text-primary uppercase tracking-widest mb-4">Library</p>
           <h1 className="text-4xl md:text-5xl font-medium mb-4">
-            Behavioral Library
+            xBPP Library
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Policies, scenarios, reason codes, and agent templates.

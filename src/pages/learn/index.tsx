@@ -49,7 +49,7 @@ export default function LearnIndex() {
             Choose Your Path
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Start with a quick integration or dive deep into behavioral policy.
+            Start with a quick integration or dive deep into execution boundary policies.
           </p>
         </header>
         

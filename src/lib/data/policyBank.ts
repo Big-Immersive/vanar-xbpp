@@ -1,6 +1,6 @@
 import { PolicyTemplate, Posture } from '../types';
 
-// Policy templates based on xBPP Master Specification v1.0
+// Policy templates based on xBPP (Execution Boundary Permission Protocol) Master Specification v1.0
 // These are real-world starting points for different use cases
 
 export const policyTemplates: PolicyTemplate[] = [

@@ -1,4 +1,4 @@
-# xBPP: Behavioral Policy Protocol
+# xBPP: Execution Boundary Permission Protocol
 
 **Master Specification v1.0**
 
@@ -13,7 +13,7 @@
 
 ## What is xBPP?
 
-xBPP (Behavioral Policy Protocol) is an open standard that lets autonomous AI agents make payments safely. It answers a simple question: *"Should this agent be allowed to spend this money?"*
+xBPP (Execution Boundary Permission Protocol) is an open standard that lets autonomous AI agents make payments safely. It answers a simple question: *"Should this agent be allowed to spend this money?"*
 
 When an AI agent wants to make a payment, xBPP evaluates the request against a policy you define and returns one of three answers:
 
