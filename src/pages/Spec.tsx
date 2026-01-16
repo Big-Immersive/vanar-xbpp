@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Download, FileJson, Shield, Zap, AlertTriangle, ExternalLink, Sparkles, Play, List, FlaskConical, Menu, ArrowUp } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Download, FileJson, Shield, Zap, AlertTriangle, ExternalLink, Sparkles, Play, List, FlaskConical, Menu, ArrowUp, Search } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -67,6 +67,49 @@ const postureDefaults = [
   { situation: 'Low confidence', aggressive: 'Warn', balanced: 'Escalate', cautious: 'Block' },
 ];
 
+const glossaryTerms = [
+  {
+    term: 'xBPP (Execution Boundary Permission Protocol)',
+    description: 'An open standard for autonomous agent governance. xBPP defines execution boundaries that determine whether an AI agent can proceed with an action, must stop, or should escalate to human oversight. The protocol serves as a "programmable super-ego" for autonomous systems.',
+  },
+  {
+    term: 'Execution Boundary',
+    description: 'The set of constraints and rules that define what actions an autonomous agent is permitted to take. Unlike simple spending limits, execution boundaries encompass verification requirements, threat detection, rate limiting, and escalation triggers.',
+  },
+  {
+    term: 'Verdict',
+    description: 'The signed decision returned by the xBPP interpreter after evaluating an action against a policy. A verdict contains one of three decisions (ALLOW, BLOCK, ESCALATE), along with reason codes explaining why, and cryptographic evidence for auditability.',
+  },
+  {
+    term: 'Posture',
+    description: 'A preset risk tolerance that determines how ambiguous situations are handled. AGGRESSIVE favors action and autonomy, CAUTIOUS maximizes oversight and blocks uncertainty, and BALANCED provides a middle ground.',
+  },
+  {
+    term: 'Reason Code',
+    description: 'A standardized identifier (e.g., EXCEEDS_SINGLE_LIMIT, DRAINER_CONTRACT) that explains why a particular verdict was reached. Reason codes enable consistent logging, auditing, and programmatic handling of policy decisions.',
+  },
+  {
+    term: '9-Phase Evaluation',
+    description: 'The structured evaluation sequence xBPP uses to assess every action: (1) Validation, (2) Emergency Checks, (3) Input Validation, (4) Core Limits, (5) Duplicate Detection, (6) Verification, (7) Profile Checks, (8) Escalation Triggers, (9) Final Decision.',
+  },
+  {
+    term: 'Principal',
+    description: 'The human or organization ultimately responsible for an agent\'s actions. The principal defines the policy, receives escalations, and bears liability for permitted transactions.',
+  },
+  {
+    term: 'Escalation',
+    description: 'A pause in autonomous execution that requests human decision-making. Escalations are triggered when actions require approval (high-value transactions), fall into policy ambiguity, or when explicit human oversight is mandated.',
+  },
+  {
+    term: 'Agentic Gap',
+    description: 'The divide between what autonomous agents can do (capability) and who is responsible when things go wrong (liability). xBPP bridges this gap by providing a standardized framework for defining and enforcing execution boundaries.',
+  },
+  {
+    term: 'x402',
+    description: 'A payment protocol that enables AI agents to make authenticated payments over HTTP. xBPP integrates with x402 to provide policy enforcement for autonomous transactions, wrapping the x402 client with execution boundary controls.',
+  },
+];
+
 function CodeBlock({ code, language = 'typescript' }: { code: string; language?: string }) {
   const [copied, setCopied] = useState(false);
   
@@ -114,6 +157,7 @@ export default function Spec() {
   const [activeSection, setActiveSection] = useState('overview');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [glossarySearch, setGlossarySearch] = useState('');
   const [simulatorConfig, setSimulatorConfig] = useState<PolicyConfig>({
     posture: 'BALANCED',
     maxSingle: 100,
@@ -126,6 +170,16 @@ export default function Spec() {
     minConfidence: 0.7,
     logLevel: 'STANDARD',
   });
+
+  const filteredGlossaryTerms = useMemo(() => {
+    if (!glossarySearch.trim()) return glossaryTerms;
+    const query = glossarySearch.toLowerCase();
+    return glossaryTerms.filter(
+      (item) =>
+        item.term.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query)
+    );
+  }, [glossarySearch]);
 
   // Scroll progress tracking
   useEffect(() => {
@@ -453,80 +507,35 @@ export default function Spec() {
                 Glossary
               </h2>
               
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-4">
                 Essential terminology for understanding and implementing the Execution Boundary Permission Protocol.
               </p>
               
+              {/* Search Input */}
+              <div className="relative mb-6">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search terms..."
+                  value={glossarySearch}
+                  onChange={(e) => setGlossarySearch(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background"
+                />
+              </div>
+              
               <div className="space-y-4">
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">xBPP (Execution Boundary Permission Protocol)</h4>
-                  <p className="text-muted-foreground text-sm">
-                    An open standard for autonomous agent governance. xBPP defines execution boundaries that determine whether an AI agent can proceed with an action, must stop, or should escalate to human oversight. The protocol serves as a "programmable super-ego" for autonomous systems.
+                {filteredGlossaryTerms.length === 0 ? (
+                  <p className="text-muted-foreground text-sm py-8 text-center">
+                    No terms match "{glossarySearch}"
                   </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">Execution Boundary</h4>
-                  <p className="text-muted-foreground text-sm">
-                    The set of constraints and rules that define what actions an autonomous agent is permitted to take. Unlike simple spending limits, execution boundaries encompass verification requirements, threat detection, rate limiting, and escalation triggers.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">Verdict</h4>
-                  <p className="text-muted-foreground text-sm">
-                    The signed decision returned by the xBPP interpreter after evaluating an action against a policy. A verdict contains one of three decisions (ALLOW, BLOCK, ESCALATE), along with reason codes explaining why, and cryptographic evidence for auditability.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">Posture</h4>
-                  <p className="text-muted-foreground text-sm">
-                    A preset risk tolerance that determines how ambiguous situations are handled. AGGRESSIVE favors action and autonomy, CAUTIOUS maximizes oversight and blocks uncertainty, and BALANCED provides a middle ground.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">Reason Code</h4>
-                  <p className="text-muted-foreground text-sm">
-                    A standardized identifier (e.g., EXCEEDS_SINGLE_LIMIT, DRAINER_CONTRACT) that explains why a particular verdict was reached. Reason codes enable consistent logging, auditing, and programmatic handling of policy decisions.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">9-Phase Evaluation</h4>
-                  <p className="text-muted-foreground text-sm">
-                    The structured evaluation sequence xBPP uses to assess every action: (1) Validation, (2) Emergency Checks, (3) Input Validation, (4) Core Limits, (5) Duplicate Detection, (6) Verification, (7) Profile Checks, (8) Escalation Triggers, (9) Final Decision.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">Principal</h4>
-                  <p className="text-muted-foreground text-sm">
-                    The human or organization ultimately responsible for an agent's actions. The principal defines the policy, receives escalations, and bears liability for permitted transactions.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">Escalation</h4>
-                  <p className="text-muted-foreground text-sm">
-                    A pause in autonomous execution that requests human decision-making. Escalations are triggered when actions require approval (high-value transactions), fall into policy ambiguity, or when explicit human oversight is mandated.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">Agentic Gap</h4>
-                  <p className="text-muted-foreground text-sm">
-                    The divide between what autonomous agents can do (capability) and who is responsible when things go wrong (liability). xBPP bridges this gap by providing a standardized framework for defining and enforcing execution boundaries.
-                  </p>
-                </div>
-                
-                <div className="p-4 rounded-lg bg-card/50 border border-border">
-                  <h4 className="font-mono text-primary font-medium mb-2">x402</h4>
-                  <p className="text-muted-foreground text-sm">
-                    A payment protocol that enables AI agents to make authenticated payments over HTTP. xBPP integrates with x402 to provide policy enforcement for autonomous transactions, wrapping the x402 client with execution boundary controls.
-                  </p>
-                </div>
+                ) : (
+                  filteredGlossaryTerms.map((item) => (
+                    <div key={item.term} className="p-4 rounded-lg bg-card/50 border border-border">
+                      <h4 className="font-mono text-primary font-medium mb-2">{item.term}</h4>
+                      <p className="text-muted-foreground text-sm">{item.description}</p>
+                    </div>
+                  ))
+                )}
               </div>
             </section>
 
