@@ -124,7 +124,7 @@ ${diff.consequence_summary.tradeoff}
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <header className="mb-16 animate-fade-in">
-          <h1 className="text-4xl md:text-5xl font-medium">Export Results</h1>
+          <h1 className="text-4xl md:text-5xl font-medium" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>Export Results</h1>
           <p className="text-lg text-muted-foreground mt-4">
             Download policy definitions and reports for <span className="text-foreground">{selectedScenario.name}</span>
           </p>

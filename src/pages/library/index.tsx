@@ -55,7 +55,7 @@ export default function LibraryIndex() {
         {/* Header */}
         <header className="mb-12 text-center">
           <p className="text-sm font-mono text-primary uppercase tracking-widest mb-4">Library</p>
-          <h1 className="text-4xl md:text-5xl font-medium mb-4">
+          <h1 className="text-4xl md:text-5xl font-medium mb-4" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
             xBPP Library
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -86,7 +86,7 @@ export default function LibraryIndex() {
                     {section.count}
                   </span>
                 </div>
-                <h2 className="text-lg font-medium mb-2">{section.title}</h2>
+                <h2 className="text-lg font-medium mb-2" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>{section.title}</h2>
                 <p className="text-sm text-muted-foreground mb-4">{section.description}</p>
                 <div className="flex items-center text-sm font-medium text-primary group-hover:gap-2 transition-all">
                   <span>Explore</span>

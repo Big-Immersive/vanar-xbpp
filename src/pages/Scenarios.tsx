@@ -79,9 +79,9 @@ export default function Scenarios() {
             <div className="w-1.5 h-1.5 rounded-full bg-primary" />
             Vanar xBPP
           </Link>
-          <h1 
+          <h1
             className="text-4xl md:text-5xl lg:text-6xl font-medium mt-6 mb-6 animate-fade-in"
-            style={{ animationDelay: '100ms' }}
+            style={{ animationDelay: '100ms', fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}
           >
             {useCustomPolicy ? 'Test your policy' : 'Choose a scenario'}
           </h1>

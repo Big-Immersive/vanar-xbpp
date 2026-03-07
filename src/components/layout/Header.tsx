@@ -116,8 +116,11 @@ export function Header() {
             className="flex items-center gap-2 group"
           >
             <div className="w-2 h-2 rounded-full bg-primary group-hover:scale-125 transition-transform" />
-            <span className="text-sm font-mono tracking-[0.2em] uppercase text-muted-foreground group-hover:text-foreground transition-colors">
-              VANAR xBPP
+            <span
+              className="text-sm tracking-[0.15em] uppercase text-muted-foreground group-hover:text-foreground transition-colors"
+              style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}
+            >
+              VANAR | xBPP
             </span>
           </Link>
           

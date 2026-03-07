@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/seo';
 import { useState, useMemo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -356,6 +357,7 @@ export default function TestSuite() {
 
   return (
     <div className="min-h-screen bg-background pt-20">
+      <SEOHead title="xBPP Compliance Test Suite — Verify Agent Payment Policies" description="Run compliance tests to verify your xBPP agent payment policies. Automated test scenarios, verdict validation, and audit logs." path="/test-suite" />
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
         <motion.div 
@@ -363,7 +365,7 @@ export default function TestSuite() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-bold mb-2">xBPP Test Suite</h1>
+          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>xBPP Test Suite</h1>
           <p className="text-muted-foreground">
             Run all scenarios against selected policy postures to validate behavior
           </p>

@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/seo';
 import { useState, useEffect, useMemo } from 'react';
 import { BookOpen, Copy, Check, ChevronDown, ChevronRight, Download, FileJson, Shield, Zap, AlertTriangle, ExternalLink, Sparkles, Play, List, FlaskConical, Menu, ArrowUp, Search } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
@@ -270,6 +271,7 @@ export default function Spec() {
 
   return (
     <div className="min-h-screen relative">
+      <SEOHead title="xBPP Protocol Specification — Agent Payment Policy Standard" description="The complete xBPP technical specification. JSON-based agent payment policies, verdict engine, reason codes, and x402 integration guide." path="/spec" />
       {/* Scroll Progress Bar */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-muted/30 z-50">
         <div 
@@ -328,7 +330,7 @@ export default function Spec() {
                     <BookOpen className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <h1 className="text-4xl md:text-5xl font-medium">xBPP Specification</h1>
+                    <h1 className="text-4xl md:text-5xl font-medium" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>xBPP Specification</h1>
                     <p className="text-lg text-muted-foreground mt-1">Execution Boundary Permission Protocol for Autonomous Agents</p>
                   </div>
                 </div>
@@ -359,7 +361,7 @@ export default function Spec() {
 
             {/* Overview Section */}
             <section id="overview" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <BookOpen className="h-6 w-6 text-primary" />
                 What is xBPP?
               </h2>
@@ -428,7 +430,7 @@ export default function Spec() {
 
             {/* How It Works */}
             <section id="how-it-works" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <Zap className="h-6 w-6 text-primary" />
                 How It Works (30-Second Version)
               </h2>
@@ -455,7 +457,7 @@ export default function Spec() {
 
             {/* Key Concepts */}
             <section id="key-concepts" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <FileJson className="h-6 w-6 text-primary" />
                 Key Concepts
               </h2>
@@ -502,7 +504,7 @@ export default function Spec() {
 
             {/* Glossary */}
             <section id="glossary" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <FileJson className="h-6 w-6 text-primary" />
                 Glossary
               </h2>
@@ -541,7 +543,7 @@ export default function Spec() {
 
 
             <section id="policy-builder" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <Sparkles className="h-6 w-6 text-primary" />
                 Interactive Policy Builder
               </h2>
@@ -555,7 +557,7 @@ export default function Spec() {
 
             {/* Verdict Simulator */}
             <section id="verdict-simulator" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <Play className="h-6 w-6 text-primary" />
                 Advanced Verdict Simulator
               </h2>
@@ -569,7 +571,7 @@ export default function Spec() {
 
             {/* Reason Codes Reference */}
             <section id="reason-codes" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <List className="h-6 w-6 text-primary" />
                 Reason Codes Reference
               </h2>
@@ -583,7 +585,7 @@ export default function Spec() {
 
             {/* Policy Structure */}
             <section id="policy-structure" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <Shield className="h-6 w-6 text-primary" />
                 Policy Structure
               </h2>
@@ -618,7 +620,7 @@ export default function Spec() {
 
             {/* Postures */}
             <section id="postures" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <AlertTriangle className="h-6 w-6 text-primary" />
                 Postures
               </h2>
@@ -671,7 +673,7 @@ export default function Spec() {
 
             {/* Default Policies */}
             <section id="default-policies" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <Shield className="h-6 w-6 text-primary" />
                 Default Policies
               </h2>
@@ -761,7 +763,7 @@ export default function Spec() {
 
             {/* SDK Integration */}
             <section id="sdk" className="mb-16 scroll-mt-28">
-              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3">
+              <h2 className="text-2xl font-medium mb-6 flex items-center gap-3" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>
                 <Zap className="h-6 w-6 text-primary" />
                 SDK Integration
               </h2>

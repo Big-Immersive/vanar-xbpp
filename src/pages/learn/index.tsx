@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Clock, Lightbulb, BookOpen, ArrowRight } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
+import { SEOHead } from '@/components/seo';
 import { cn } from '@/lib/utils';
 
 const learningPaths = [
@@ -38,14 +39,20 @@ const learningPaths = [
 
 export default function LearnIndex() {
   return (
-    <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
+    <>
+      <SEOHead
+        title="Learn xBPP — Agent Payment Governance Guide"
+        description="Learn how to govern AI agent payments with xBPP. Quick start guides, real-world examples, and core concepts."
+        path="/learn"
+      />
+      <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
       <AnimatedBackground variant="subtle" />
-      
+
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <header className="mb-12 text-center">
           <p className="text-sm font-mono text-primary uppercase tracking-widest mb-4">Learn</p>
-          <h1 className="text-4xl md:text-5xl font-medium mb-4">
+          <h1 className="text-4xl md:text-5xl font-medium mb-4" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
             Choose Your Path
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -89,5 +96,6 @@ export default function LearnIndex() {
         </div>
       </div>
     </div>
+    </>
   );
 }

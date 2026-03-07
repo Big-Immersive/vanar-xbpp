@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/seo';
 import { AnimatedBackground, ScrollReveal } from '@/components/effects';
 import {
   HeroSection,
@@ -9,12 +10,14 @@ import {
   PlaygroundPreview,
   WhoIsForSection,
   FinalCTASection,
+  FAQSection,
   Footer,
 } from '@/components/landing';
 
 export default function Landing() {
   return (
     <div className="relative overflow-hidden">
+      <SEOHead title="xBPP — AI Agent Payment Governance | Open Standard" description="The open standard for governing autonomous AI agent payments. Built for x402. Define your rules once — every transaction follows them. By VanarChain." path="/" />
       <AnimatedBackground variant="default" />
       
       {/* 1. Hero - The hook (no scroll animation - already has mount animation) */}
@@ -55,7 +58,12 @@ export default function Landing() {
         <WhoIsForSection />
       </ScrollReveal>
       
-      {/* 9. Final CTA */}
+      {/* 9. FAQ */}
+      <ScrollReveal variant="fade-up">
+        <FAQSection />
+      </ScrollReveal>
+
+      {/* 10. Final CTA */}
       <ScrollReveal variant="blur">
         <FinalCTASection />
       </ScrollReveal>

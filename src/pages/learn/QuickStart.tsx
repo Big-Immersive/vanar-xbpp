@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CheckCircle, Copy, Check, ArrowRight, Play, Zap, Clock } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
+import { SEOHead } from '@/components/seo';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -81,9 +82,15 @@ export default function QuickStart() {
   };
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
+    <>
+      <SEOHead
+        title="xBPP Quick Start — Add Payment Governance to AI Agents in 60 Seconds"
+        description="Install @vanarchain/xbpp, wrap your x402 client, and enforce payment policies on your AI agent in under 60 seconds."
+        path="/learn/quick-start"
+      />
+      <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
       <AnimatedBackground variant="subtle" />
-      
+
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <header className="mb-12 text-center">
@@ -91,7 +98,7 @@ export default function QuickStart() {
             <Clock className="w-4 h-4 text-primary" />
             <span className="text-sm font-mono text-primary">~60 seconds</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-medium mb-4">
+          <h1 className="text-4xl md:text-5xl font-medium mb-4" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
             Quick Start
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -181,5 +188,6 @@ export default function QuickStart() {
         </div>
       </div>
     </div>
+    </>
   );
 }

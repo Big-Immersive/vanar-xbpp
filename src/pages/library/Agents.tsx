@@ -131,7 +131,7 @@ export default function AgentsPage() {
         {/* Header */}
         <header className="mb-12">
           <p className="text-sm font-mono text-primary uppercase tracking-widest mb-4">Library</p>
-          <h1 className="text-4xl md:text-5xl font-medium mb-4">
+          <h1 className="text-4xl md:text-5xl font-medium mb-4" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
             Agent Type Templates
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">

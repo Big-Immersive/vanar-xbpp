@@ -62,7 +62,7 @@ export default function Summary() {
               Consequence Summary
             </p>
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium">{selectedScenario.name}</h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-medium" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>{selectedScenario.name}</h1>
         </header>
         
         {/* Narrative Sections */}
@@ -186,7 +186,7 @@ function NarrativeSection({ title, content, isVisible, accentColor }: NarrativeS
         "p-8 rounded-xl border-l-4",
         colorClasses[accentColor]
       )}>
-        <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+        <h2 className="text-sm font-mono text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
           <span className={cn(
             "w-2 h-2 rounded-full",
             accentColor === 'primary' && "bg-primary",

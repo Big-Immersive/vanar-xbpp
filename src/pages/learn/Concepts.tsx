@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
-import { 
+import {
   FileJson, Shield, AlertTriangle, Zap, Play, ArrowRight,
   CheckCircle, XCircle, Clock, Target
 } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
+import { SEOHead } from '@/components/seo';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -74,14 +75,20 @@ const decisions = [
 
 export default function Concepts() {
   return (
-    <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
+    <>
+      <SEOHead
+        title="xBPP Core Concepts — Agent Payment Policies Explained"
+        description="Understand xBPP policies, verdicts, reason codes, and how autonomous AI agents use declarative rules to govern payments."
+        path="/learn/concepts"
+      />
+      <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
       <AnimatedBackground variant="subtle" />
-      
+
       <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
         <header className="mb-16">
           <p className="text-sm font-mono text-primary uppercase tracking-widest mb-4">Core Concepts</p>
-          <h1 className="text-4xl md:text-5xl font-medium mb-4">
+          <h1 className="text-4xl md:text-5xl font-medium mb-4" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
             How xBPP Works
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
@@ -91,7 +98,7 @@ export default function Concepts() {
         
         {/* The Flow */}
         <section className="mb-16">
-          <h2 className="text-2xl font-medium mb-6">The Evaluation Flow</h2>
+          <h2 className="text-2xl font-medium mb-6" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>The Evaluation Flow</h2>
           <div className="p-6 rounded-2xl border border-border bg-card/30">
             <div className="flex flex-col md:flex-row items-center gap-4 text-center">
               <div className="p-4 rounded-xl bg-muted/50 border border-border flex-1 w-full">
@@ -114,7 +121,7 @@ export default function Concepts() {
         
         {/* Key Concepts */}
         <section className="mb-16">
-          <h2 className="text-2xl font-medium mb-6">Key Concepts</h2>
+          <h2 className="text-2xl font-medium mb-6" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>Key Concepts</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {concepts.map((concept) => {
               const Icon = concept.icon;
@@ -141,7 +148,7 @@ export default function Concepts() {
         
         {/* The Three Decisions */}
         <section className="mb-16">
-          <h2 className="text-2xl font-medium mb-6">The Three Decisions</h2>
+          <h2 className="text-2xl font-medium mb-6" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>The Three Decisions</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {decisions.map((decision) => {
               const Icon = decision.icon;
@@ -190,5 +197,6 @@ export default function Concepts() {
         </div>
       </div>
     </div>
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { SEOHead } from '@/components/seo';
 import { useState, useEffect } from 'react';
 import { Play, Settings, Zap, CheckCircle2, XCircle, AlertCircle, ChevronRight, RotateCcw, Plus, Bot, Plane, Code, TrendingUp, Headphones, ShoppingCart, Search, Cpu, Users } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
@@ -207,12 +208,13 @@ export default function Playground() {
 
   return (
     <div className="min-h-screen pt-20 relative overflow-hidden">
+      <SEOHead title="xBPP Playground — Build and Test Agent Payment Policies" description="Interactive playground to build, test, and simulate AI agent payment policies. See live verdicts: ALLOW, BLOCK, ESCALATE." path="/playground" />
       <AnimatedBackground variant="subtle" />
       
       <div className="max-w-[1600px] mx-auto px-6 py-8 relative z-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-medium mb-2">Interactive Playground</h1>
+          <h1 className="text-3xl font-medium mb-2" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif", color: '#282B35' }}>Interactive Playground</h1>
           <p className="text-muted-foreground">
             Configure an agent, inject transactions, and watch the 9-phase xBPP evaluation in real-time.
           </p>

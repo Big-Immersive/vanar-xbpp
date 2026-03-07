@@ -16,3 +16,4 @@ export { FinalCTASection } from './FinalCTASection';
 export { Footer } from './Footer';
 export { UseCaseCarousel } from './UseCaseCarousel';
 export { PlaygroundPreview } from './PlaygroundPreview';
+export { FAQSection } from './FAQSection';

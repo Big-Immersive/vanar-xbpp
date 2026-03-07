@@ -1,74 +1,157 @@
 import { Link } from 'react-router-dom';
 
+const buildLinks = [
+  { label: 'Quick Start Guide', path: '/learn/quick-start' },
+  { label: 'Interactive Playground', path: '/playground' },
+  { label: 'Protocol Specification', path: '/spec' },
+  { label: 'SDK Reference', path: '/learn/quick-start' },
+];
+
+const libraryLinks = [
+  { label: 'Policy Templates', path: '/library/policies' },
+  { label: 'Test Scenarios', path: '/library/scenarios' },
+  { label: 'Reason Codes', path: '/library/reason-codes' },
+  { label: 'Agent Types', path: '/library/agents' },
+];
+
+const learnLinks = [
+  { label: 'Getting Started', path: '/learn' },
+  { label: 'Agent Payment Examples', path: '/learn/by-example' },
+  { label: 'Core Concepts', path: '/learn/concepts' },
+  { label: 'Compliance Test Suite', path: '/test-suite' },
+];
+
 export function Footer() {
   return (
-    <footer className="py-12 px-6 lg:px-12" style={{ background: '#EDEDEA', borderTop: '1px solid #E2E2DE' }}>
+    <footer className="py-16 px-6 lg:px-12" style={{ background: '#1B2129', borderTop: '1px solid rgba(202, 208, 218, 0.15)' }}>
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           {/* Brand */}
-          <div className="text-center md:text-left">
-            <div className="flex items-center gap-3 justify-center md:justify-start mb-2">
+          <div>
+            <div className="flex items-center gap-3 mb-3">
               <div
-                className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #3ECFA5, #2AAF8E)' }}
+                className="w-8 h-8 flex items-center justify-center"
+                style={{
+                  background: 'linear-gradient(135deg, #03D9AF, #02B892)',
+                  clipPath: 'polygon(6px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 6px)',
+                }}
               >
-                <span className="text-white font-display text-lg">V</span>
+                <span className="text-white text-lg font-bold" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>V</span>
               </div>
-              <span className="text-sm font-semibold tracking-[0.15em] uppercase" style={{ color: '#1E2D2D' }}>
-                VANAR xBPP
+              <span
+                className="text-sm tracking-[0.15em] uppercase"
+                style={{
+                  color: '#e8e9e9',
+                  fontFamily: "'Akira Expanded', 'Arial Black', sans-serif",
+                }}
+              >
+                VANAR | xBPP
               </span>
             </div>
-            <p className="text-sm" style={{ color: '#6B6B67' }}>Built on VanarChain</p>
+            <p className="text-sm" style={{ color: '#6B6F7D', fontFamily: "'Figtree', system-ui, sans-serif" }}>
+              The open standard for governing autonomous AI agent payments.
+            </p>
           </div>
 
-          {/* Links */}
-          <div className="flex items-center gap-8 text-sm">
-            <Link
-              to="/scenarios"
-              className="transition-colors"
-              style={{ color: '#6B6B67' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1E2D2D'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#6B6B67'}
+          {/* Build */}
+          <div>
+            <h4
+              className="text-xs tracking-[0.2em] uppercase mb-4"
+              style={{
+                fontFamily: "'Akira Expanded', 'Arial Black', sans-serif",
+                color: '#03D9AF',
+              }}
             >
-              Run a simulation
-            </Link>
-            <Link
-              to="/spec"
-              className="transition-colors"
-              style={{ color: '#6B6B67' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#1E2D2D'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#6B6B67'}
+              Build
+            </h4>
+            <ul className="space-y-2">
+              {buildLinks.map(({ label, path }) => (
+                <li key={label}>
+                  <Link
+                    to={path}
+                    className="text-sm transition-colors"
+                    style={{ color: '#CAD0DA', fontFamily: "'Figtree', system-ui, sans-serif" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#03D9AF')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#CAD0DA')}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Library */}
+          <div>
+            <h4
+              className="text-xs tracking-[0.2em] uppercase mb-4"
+              style={{
+                fontFamily: "'Akira Expanded', 'Arial Black', sans-serif",
+                color: '#03D9AF',
+              }}
             >
-              View the standard
-            </Link>
-            <a
-              href="https://github.com/vanarchain/xbpp"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors"
-              style={{ color: '#6B6B67' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#3ECFA5'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#6B6B67'}
+              Library
+            </h4>
+            <ul className="space-y-2">
+              {libraryLinks.map(({ label, path }) => (
+                <li key={label}>
+                  <Link
+                    to={path}
+                    className="text-sm transition-colors"
+                    style={{ color: '#CAD0DA', fontFamily: "'Figtree', system-ui, sans-serif" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#03D9AF')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#CAD0DA')}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Learn */}
+          <div>
+            <h4
+              className="text-xs tracking-[0.2em] uppercase mb-4"
+              style={{
+                fontFamily: "'Akira Expanded', 'Arial Black', sans-serif",
+                color: '#03D9AF',
+              }}
             >
-              GitHub
-            </a>
+              Learn
+            </h4>
+            <ul className="space-y-2">
+              {learnLinks.map(({ label, path }) => (
+                <li key={label}>
+                  <Link
+                    to={path}
+                    className="text-sm transition-colors"
+                    style={{ color: '#CAD0DA', fontFamily: "'Figtree', system-ui, sans-serif" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#03D9AF')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#CAD0DA')}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
         {/* Bottom */}
-        <div className="mt-8 pt-8 text-center" style={{ borderTop: '1px solid #E2E2DE' }}>
-          <p className="text-xs font-mono" style={{ color: '#9E9E98' }}>
-            Where agent behavior becomes obvious. &mdash;{' '}
-            <a
-              href="https://vanarchain.com"
-              className="transition-colors"
-              style={{ color: '#9E9E98' }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#3ECFA5'}
-              onMouseLeave={(e) => e.currentTarget.style.color = '#9E9E98'}
-            >
-              vanarchain.com
-            </a>
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid rgba(202, 208, 218, 0.15)' }}>
+          <p className="text-xs font-mono" style={{ color: '#6B6F7D' }}>
+            Where agent behavior becomes obvious.
           </p>
+          <a
+            href="https://vanarchain.com"
+            className="text-xs font-mono transition-colors"
+            style={{ color: '#6B6F7D' }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#03D9AF')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#6B6F7D')}
+          >
+            vanarchain.com
+          </a>
         </div>
       </div>
     </footer>

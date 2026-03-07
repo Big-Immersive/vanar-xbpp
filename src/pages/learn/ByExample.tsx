@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Plane, Code, TrendingUp, Headphones, ShoppingCart, 
-  Search, Cpu, Users, AlertTriangle, CheckCircle, 
+import {
+  Plane, Code, TrendingUp, Headphones, ShoppingCart,
+  Search, Cpu, Users, AlertTriangle, CheckCircle,
   ArrowRight, Play, Shield
 } from 'lucide-react';
 import { AnimatedBackground } from '@/components/effects';
+import { SEOHead } from '@/components/seo';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -234,14 +235,20 @@ export default function ByExample() {
   const [activeCase, setActiveCase] = useState(useCases[0]);
 
   return (
-    <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
+    <>
+      <SEOHead
+        title="xBPP By Example — Real AI Agent Payment Policy Patterns"
+        description="Practical examples of xBPP agent payment policies: e-commerce agents, DeFi bots, autonomous research agents, and enterprise AI systems."
+        path="/learn/by-example"
+      />
+      <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
       <AnimatedBackground variant="subtle" />
-      
+
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
         <header className="mb-12">
           <p className="text-sm font-mono text-primary uppercase tracking-widest mb-4">Learn by Example</p>
-          <h1 className="text-4xl md:text-5xl font-medium mb-4">
+          <h1 className="text-4xl md:text-5xl font-medium mb-4" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
             8 Ways Agents Go Wrong
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
@@ -272,5 +279,6 @@ export default function ByExample() {
         </div>
       </div>
     </div>
+    </>
   );
 }

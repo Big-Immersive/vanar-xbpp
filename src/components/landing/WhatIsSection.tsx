@@ -21,7 +21,7 @@ const features = [
 ];
 
 const whatItDoesNot = [
-  { action: 'Execute payments', explanation: "That's x402's job" },
+  { action: 'Execute payments', explanation: "That's x402's job \u2014 xBPP governs, x402 executes" },
   { action: 'Custody funds', explanation: 'xBPP is policy, not a wallet' },
   { action: 'Guarantee counterparty behavior', explanation: "Can't prevent a vendor from being malicious" },
   { action: 'Replace legal contracts', explanation: 'xBPP is technical enforcement, not legal agreement' },

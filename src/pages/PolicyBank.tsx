@@ -192,7 +192,7 @@ export default function PolicyBank() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
             Policy Bank
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

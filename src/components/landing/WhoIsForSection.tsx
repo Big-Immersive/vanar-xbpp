@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { Code, Shield, Building2, Blocks, Brain } from 'lucide-react';
 
 const personas = [
-  { icon: Code, title: 'Base Developers', description: 'Building autonomous agents on-chain' },
-  { icon: Shield, title: 'Enterprise CTOs', description: 'Governing agent fleets at scale' },
-  { icon: Blocks, title: 'Protocol Builders', description: 'Designing the rules of interaction' },
-  { icon: Building2, title: 'Security Architects', description: 'Protecting systems from misuse' },
-  { icon: Brain, title: 'AI Systems Leads', description: 'Directing intelligent systems' },
+  { icon: Code, title: 'Base Developers', description: 'Building autonomous agents on-chain', href: '/learn/quick-start' },
+  { icon: Shield, title: 'Enterprise CTOs', description: 'Governing agent fleets at scale', href: '/library/policies' },
+  { icon: Blocks, title: 'Protocol Builders', description: 'Designing the rules of interaction', href: '/spec' },
+  { icon: Building2, title: 'Security Architects', description: 'Protecting systems from misuse', href: '/library/scenarios' },
+  { icon: Brain, title: 'AI Systems Leads', description: 'Directing intelligent systems', href: '/learn/concepts' },
 ];
 
 export function WhoIsForSection() {
@@ -61,10 +62,11 @@ export function WhoIsForSection() {
           {personas.map((persona, index) => {
             const Icon = persona.icon;
             return (
-              <div
+              <Link
+                to={persona.href}
                 key={persona.title}
                 className={cn(
-                  "group p-6 transition-all duration-500"
+                  "group p-6 transition-all duration-500 block"
                 )}
                 style={{
                   transitionDelay: `${300 + index * 100}ms`,
@@ -77,7 +79,7 @@ export function WhoIsForSection() {
                 <Icon className="h-8 w-8 mb-4 transition-transform group-hover:scale-110" style={{ color: '#03D9AF' }} />
                 <h3 className="font-medium mb-2 text-sm" style={{ color: '#282B35', fontFamily: "'Figtree', sans-serif" }}>{persona.title}</h3>
                 <p className="text-xs" style={{ color: '#6B6F7D', fontFamily: "'Figtree', sans-serif" }}>{persona.description}</p>
-              </div>
+              </Link>
             );
           })}
         </div>

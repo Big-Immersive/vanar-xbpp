@@ -110,7 +110,7 @@ export default function ReasonCodesPage() {
         {/* Header */}
         <header className="mb-8">
           <p className="text-sm font-mono text-primary uppercase tracking-widest mb-4">Library</p>
-          <h1 className="text-4xl md:text-5xl font-medium mb-4">
+          <h1 className="text-4xl md:text-5xl font-medium mb-4" style={{ fontFamily: "'Akira Expanded', 'Arial Black', sans-serif" }}>
             Reason Codes Reference
           </h1>
           <p className="text-xl text-muted-foreground max-w-2xl">
