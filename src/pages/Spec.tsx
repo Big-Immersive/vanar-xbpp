@@ -350,11 +350,11 @@ export default function Spec() {
                     SDK Guide (810 lines)
                   </a>
                 </Button>
-                <Button variant="ghost" size="sm" disabled className="opacity-40 cursor-not-allowed">
-                  <span className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" asChild>
+                  <a href="https://github.com/Big-Immersive/xbpp-sdk" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
                     <ExternalLink className="h-4 w-4" />
-                    GitHub (coming soon)
-                  </span>
+                    GitHub
+                  </a>
                 </Button>
               </div>
             </header>

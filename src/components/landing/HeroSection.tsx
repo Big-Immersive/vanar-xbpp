@@ -80,7 +80,7 @@ export function HeroSection() {
                 background: 'linear-gradient(135deg, #9ca3af, #6b7280)',
                 clipPath: 'polygon(10px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 10px)',
               }}
-              title="Reference implementation coming soon"
+              title="github.com/Big-Immersive/xbpp-sdk"
             >
               <Github className="h-4 w-4" />
               SDK Coming Soon
