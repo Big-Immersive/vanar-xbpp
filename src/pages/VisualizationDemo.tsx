@@ -1,4 +1,4 @@
-import { TransactionFlow, WizardMascot } from '@/components/visualization';
+import { TransactionFlow, WizardMascot, AnimatedWizard } from '@/components/visualization';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -88,7 +88,7 @@ export default function VisualizationDemo() {
           </div>
         </motion.div>
 
-        {/* Wizard Mascot */}
+        {/* Animated SVG Wizard */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -96,17 +96,52 @@ export default function VisualizationDemo() {
           className="mt-16"
         >
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-2 h-2 rounded-full bg-purple-500" />
-            <span className="text-xs font-semibold tracking-[0.2em] text-purple-500 uppercase">
-              The Gatekeeper Mascot
+            <div className="w-2 h-2 rounded-full bg-[#3ECFA5]" />
+            <span className="text-xs font-semibold tracking-[0.2em] text-[#3ECFA5] uppercase">
+              SVG Animation
             </span>
           </div>
           <h2 className="text-3xl font-display font-bold italic text-[#1E2D2D] uppercase tracking-tight mb-4">
-            The Wizard
+            The Gatekeeper
           </h2>
           <p className="text-gray-600 mb-8 max-w-xl">
-            An interactive wizard mascot powered by Lottie. Features idle, skill (evaluate), 
-            and attack (block) states that can be triggered programmatically.
+            Custom SVG wizard animated with Framer Motion. Walking animation with flowing cloak,
+            swaying beard, and magic particles when evaluating transactions.
+          </p>
+          
+          <div className="grid grid-cols-2 gap-8">
+            {/* Idle state */}
+            <div className="bg-[#0A0A0A] rounded-2xl p-8 flex flex-col items-center">
+              <span className="text-xs text-gray-500 mb-4">IDLE</span>
+              <AnimatedWizard width={300} height={375} isEvaluating={false} />
+            </div>
+            
+            {/* Evaluating state */}
+            <div className="bg-[#0A0A0A] rounded-2xl p-8 flex flex-col items-center">
+              <span className="text-xs text-[#3ECFA5] mb-4">EVALUATING</span>
+              <AnimatedWizard width={300} height={375} isEvaluating={true} />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Lottie Wizard Mascot */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-16"
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-2 h-2 rounded-full bg-purple-500" />
+            <span className="text-xs font-semibold tracking-[0.2em] text-purple-500 uppercase">
+              Lottie Alternative
+            </span>
+          </div>
+          <h2 className="text-3xl font-display font-bold italic text-[#1E2D2D] uppercase tracking-tight mb-4">
+            Interactive Mage
+          </h2>
+          <p className="text-gray-600 mb-8 max-w-xl">
+            Pre-made Lottie animation with interactive state triggers.
           </p>
           
           <div className="bg-gradient-to-br from-[#1a1a2e] to-[#16213e] rounded-2xl p-8 flex justify-center">
