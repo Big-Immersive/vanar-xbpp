@@ -2,7 +2,7 @@ import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Zap, Lock, Eye, Users, GitBranch } from 'lucide-react';
-import { AnimatedWizard } from '@/components/visualization';
+import { TracedWizard } from '@/components/visualization';
 
 // Greptile-style button with line animation
 function GreenButton({ children, href, variant = 'primary' }: { 
@@ -176,11 +176,10 @@ export default function LandingV2() {
                 onMouseLeave={() => setWizardEvaluating(false)}
               >
                 <div className="relative">
-                  <AnimatedWizard 
+                  <TracedWizard 
                     width={400} 
-                    height={500} 
+                    height={350} 
                     isEvaluating={wizardEvaluating}
-                    color="#3ECFA5"
                   />
                   {wizardEvaluating && (
                     <motion.div 
