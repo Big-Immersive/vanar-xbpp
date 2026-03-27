@@ -1,8 +1,8 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ArrowRight, Shield, Zap, Lock, Eye, Users, GitBranch, 
+import {
+  ArrowRight, Shield, Zap, Lock, Eye, Users, GitBranch,
   Check, ChevronDown, ChevronRight, Star, FileText, Code,
   AlertTriangle, Clock, Database, Cpu
 } from 'lucide-react';
@@ -11,56 +11,168 @@ import { TracedWizard } from '@/components/visualization';
 /* =============================================================================
    GREPTILE PIXEL-PERFECT CLONE FOR xBPP
    Based on https://www.greptile.com/ captured 2026-03-27
+
+   Exact values extracted via Playwright:
+   - Body BG: rgb(241,239,235) = #F1EFEB
+   - Green: rgb(16,122,77) = #107A4D
+   - Dark green: rgb(6,40,27) = #06281B
+   - Text: rgb(42,42,42) = #2A2A2A
+   - Text secondary: rgb(106,106,106) = #6A6A6A
+   - Border: rgb(204,204,204) = #CCCCCC
+   - H1: 72px/72px, weight 600, tracking -2.88px, tasaOrbiter
+   - H2: 48px, weight 600, tasaOrbiter
+   - Mono: 14-16px, geistMono
+   - Nav: 57px, border-bottom 1px solid #CCC
+   - Buttons: 8px 16px padding, 0 border-radius
+   - Content: border-x, margin 0 96px (lg:mx-24)
    ============================================================================= */
 
-// Design tokens extracted from Greptile
-const COLORS = {
-  bg: '#F5F4F0',
-  bgDark: '#1A1A1A',
-  green: '#2F6B4F',
-  greenLight: '#3D8B6A',
-  greenAccent: '#3ECFA5', // xBPP accent
-  text: '#1A1A1A',
-  textSecondary: '#6B6B6B',
-  textTertiary: '#9B9B9B',
-  border: '#E5E5E0',
-  borderDark: '#D5D5D0',
+// Design tokens — exact Greptile values
+const C = {
+  bg: '#F1EFEB',
+  green: '#107A4D',
+  greenDark: '#06281B',
+  text: '#2A2A2A',
+  textSecondary: '#6A6A6A',
+  textTertiary: '#999999',
+  border: '#CCCCCC',
+  white: '#FFFFFF',
+};
+
+// Font classes matching Greptile's typography
+const FONT = {
+  display: 'font-[\'Instrument_Serif\',Georgia,serif]',
+  mono: 'font-mono', // JetBrains Mono via tailwind config
+  body: 'font-[\'Inter\',sans-serif]',
 };
 
 // ============================================================================
-// NAVBAR - exact Greptile style
+// PROGRESSIVE LINE-FILL BUTTON
+// Greptile-style button with border lines that expand on hover
+// ============================================================================
+function LineButton({
+  children,
+  to,
+  href,
+  variant = 'primary',
+  className = '',
+  icon,
+}: {
+  children: React.ReactNode;
+  to?: string;
+  href?: string;
+  variant?: 'primary' | 'secondary' | 'dark';
+  className?: string;
+  icon?: React.ReactNode;
+}) {
+  const baseClasses = `
+    group relative inline-flex items-center gap-2
+    text-[14px] font-mono tracking-normal
+    transition-all duration-200
+  `;
+
+  const variants = {
+    primary: `bg-[${C.green}] text-white px-[16px] py-[8px]`,
+    secondary: `bg-transparent text-[${C.text}] px-[16px] py-[8px]`,
+    dark: `bg-[${C.greenDark}] text-white px-[16px] py-[8px]`,
+  };
+
+  const content = (
+    <>
+      {/* Progressive line fill - left side */}
+      {variant === 'secondary' && (
+        <>
+          <span className="absolute top-0 left-0 w-[5.5px] h-full border-t border-l border-b border-[#414141] transition-[width] duration-500 group-hover:w-full group-hover:border-b-0" />
+          <span className="absolute bottom-0 right-0 w-[5.5px] h-full border-t border-r border-b border-[#414141] transition-[width] duration-500 group-hover:w-full group-hover:border-t-0" />
+        </>
+      )}
+      {children}
+      {icon}
+    </>
+  );
+
+  const allClasses = `${baseClasses} ${variants[variant]} ${className}`;
+
+  if (to) {
+    return <Link to={to} className={allClasses}>{content}</Link>;
+  }
+  if (href) {
+    return <a href={href} className={allClasses}>{content}</a>;
+  }
+  return <button className={allClasses}>{content}</button>;
+}
+
+// ============================================================================
+// NAVBAR — exact Greptile: 57px height, 1px border-bottom #CCC
 // ============================================================================
 function Navbar() {
   return (
-    <nav className="sticky top-0 z-50 bg-[#F5F4F0] border-b border-[#E5E5E0]">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <Shield className="w-6 h-6 text-[#2F6B4F]" />
-            <span className="font-semibold text-[#1A1A1A] text-lg">xBPP</span>
-          </Link>
-          
-          {/* Center links */}
-          <div className="hidden md:flex items-center gap-8">
-            <Link to="/spec" className="text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Spec</Link>
-            <Link to="/playground" className="text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Playground</Link>
-            <Link to="/library" className="text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Library</Link>
-            <Link to="/test-suite" className="text-sm text-[#6B6B6B] hover:text-[#1A1A1A] transition-colors">Test Suite</Link>
-          </div>
-          
-          {/* Right buttons */}
-          <div className="flex items-center gap-4">
-            <Link to="/spec" className="text-sm text-[#6B6B6B] hover:text-[#1A1A1A] hidden sm:block">
-              Documentation
-            </Link>
-            <Link 
-              to="/playground"
-              className="bg-[#2F6B4F] text-white px-4 py-2 rounded text-sm font-medium hover:bg-[#3D8B6A] transition-colors"
+    <nav
+      className="sticky top-0 z-50 border-b"
+      style={{
+        backgroundColor: C.bg,
+        borderColor: C.border,
+        height: '57px',
+      }}
+    >
+      <div className="h-full mx-4 md:mx-8 lg:mx-24 xl:mx-32 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2">
+          <Shield className="w-6 h-6" style={{ color: C.green }} />
+          <span
+            className={`${FONT.display} text-[20px] font-normal`}
+            style={{ color: C.text }}
+          >
+            xBPP
+          </span>
+        </Link>
+
+        {/* Center links — 14px Inter */}
+        <div className="hidden md:flex items-center gap-6">
+          {[
+            { label: 'Spec', to: '/spec' },
+            { label: 'Playground', to: '/playground' },
+            { label: 'Library', to: '/library' },
+            { label: 'Test Suite', to: '/test-suite' },
+          ].map(link => (
+            <Link
+              key={link.label}
+              to={link.to}
+              className="text-[14px] transition-colors"
+              style={{
+                fontFamily: 'Inter, sans-serif',
+                color: C.text,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = C.green)}
+              onMouseLeave={e => (e.currentTarget.style.color = C.text)}
             >
-              Try Playground
+              {link.label}
             </Link>
-          </div>
+          ))}
+        </div>
+
+        {/* Right buttons — Greptile has Sign In (dark) + Start Now (green) */}
+        <div className="flex items-center gap-3">
+          <Link
+            to="/spec"
+            className="hidden sm:inline-flex items-center text-[14px] font-mono px-[16px] py-[8px]"
+            style={{
+              backgroundColor: C.greenDark,
+              color: C.white,
+            }}
+          >
+            Docs
+          </Link>
+          <Link
+            to="/playground"
+            className="inline-flex items-center text-[14px] font-mono px-[16px] py-[8px]"
+            style={{
+              backgroundColor: C.green,
+              color: C.white,
+            }}
+          >
+            Start Now
+          </Link>
         </div>
       </div>
     </nav>
@@ -68,177 +180,348 @@ function Navbar() {
 }
 
 // ============================================================================
-// HERO SECTION - Split layout with mascot
+// BORDERED CONTENT WRAPPER
+// Greptile pattern: border-x border-[#CCC] with mx-24 at desktop
 // ============================================================================
-function HeroSection() {
-  const [isEvaluating, setIsEvaluating] = useState(false);
-
+function BorderedContent({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <section className="border-x border-[#E5E5E0] mx-6 lg:mx-12">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-16 lg:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left content */}
-          <div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Eyebrow text - Greptile style */}
-              <p className="text-sm font-mono text-[#2F6B4F] mb-4 tracking-wide">
-                AI AGENTS THAT PROVE THEIR INTENT BEFORE SPENDING
-              </p>
-              
-              {/* Main headline */}
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-medium text-[#1A1A1A] leading-[1.05] tracking-tight">
-                The Agent<br />Gatekeeper
-              </h1>
-              
-              {/* Description */}
-              <p className="mt-6 text-lg text-[#6B6B6B] max-w-md leading-relaxed">
-                xBPP is the Execution Boundary Permission Protocol — a trust layer 
-                that verifies AI agent transactions before execution.
-              </p>
-              
-              {/* CTA Buttons */}
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link 
-                  to="/playground"
-                  className="inline-flex items-center gap-2 bg-[#2F6B4F] text-white px-5 py-2.5 rounded text-sm font-medium hover:bg-[#3D8B6A] transition-colors"
-                >
-                  Try the Playground
-                </Link>
-                <Link 
-                  to="/spec"
-                  className="inline-flex items-center gap-2 border border-[#E5E5E0] text-[#1A1A1A] px-5 py-2.5 rounded text-sm font-medium hover:border-[#D5D5D0] hover:bg-white/50 transition-colors"
-                >
-                  Read the Spec
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-              
-              {/* Trust badges - Greptile style */}
-              <div className="mt-12 flex items-center gap-6">
-                <div className="flex items-center gap-2 text-sm text-[#6B6B6B]">
-                  <div className="flex">
-                    {[1,2,3,4,5].map(i => (
-                      <Star key={i} className="w-4 h-4 text-[#2F6B4F] fill-[#2F6B4F]" />
-                    ))}
-                  </div>
-                  <span>Open Standard</span>
-                </div>
-                <div className="h-4 w-px bg-[#E5E5E0]" />
-                <div className="text-sm text-[#6B6B6B]">Built on VanarChain</div>
-              </div>
-            </motion.div>
-          </div>
-          
-          {/* Right - Wizard mascot */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="flex justify-center lg:justify-end"
-            onMouseEnter={() => setIsEvaluating(true)}
-            onMouseLeave={() => setIsEvaluating(false)}
-          >
-            <div className="relative">
-              <TracedWizard 
-                width={450} 
-                height={400} 
-                isEvaluating={isEvaluating}
-              />
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ============================================================================
-// SECTION WRAPPER with borders
-// ============================================================================
-function Section({ children, className = '', dark = false }: { 
-  children: React.ReactNode; 
-  className?: string;
-  dark?: boolean;
-}) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: '-50px' });
-
-  return (
-    <motion.section
-      ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5 }}
-      className={`border-x border-[#E5E5E0] mx-6 lg:mx-12 ${dark ? 'bg-[#1A1A1A]' : ''} ${className}`}
+    <div
+      className={`border-x mx-4 md:mx-8 lg:mx-24 xl:mx-32 ${className}`}
+      style={{ borderColor: C.border }}
     >
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-16 lg:py-20">
-        {children}
-      </div>
-    </motion.section>
-  );
-}
-
-// ============================================================================
-// FEATURE CARD with corner squares
-// ============================================================================
-function FeatureCard({ title, description, icon: Icon }: {
-  title: string;
-  description: string;
-  icon: React.ElementType;
-}) {
-  return (
-    <div className="relative border border-[#E5E5E0] bg-white/50 p-6 group hover:border-[#D5D5D0] transition-colors">
-      {/* Corner squares */}
-      <div className="absolute top-0 left-0 w-2 h-2 bg-[#E5E5E0] group-hover:bg-[#2F6B4F] transition-colors" />
-      <div className="absolute top-0 right-0 w-2 h-2 bg-[#E5E5E0] group-hover:bg-[#2F6B4F] transition-colors" />
-      <div className="absolute bottom-0 left-0 w-2 h-2 bg-[#E5E5E0] group-hover:bg-[#2F6B4F] transition-colors" />
-      <div className="absolute bottom-0 right-0 w-2 h-2 bg-[#E5E5E0] group-hover:bg-[#2F6B4F] transition-colors" />
-      
-      <Icon className="w-6 h-6 text-[#2F6B4F] mb-4" />
-      <h3 className="text-lg font-medium text-[#1A1A1A] mb-2">{title}</h3>
-      <p className="text-sm text-[#6B6B6B] leading-relaxed">{description}</p>
+      {children}
     </div>
   );
 }
 
 // ============================================================================
-// SECTION: Your second pair of eyes (Feature Grid)
+// HR SEPARATOR — Greptile: 1px solid #CCC, inside bordered area
+// ============================================================================
+function Separator() {
+  return (
+    <hr
+      className="mx-4 md:mx-8 lg:mx-24 xl:mx-32 border-0 border-t"
+      style={{ borderColor: C.border }}
+    />
+  );
+}
+
+// ============================================================================
+// SECTION BADGE — Greptile bracket notation: [ SHIP FASTER ]
+// Mono font, scrambled chars after tag text
+// ============================================================================
+function SectionBadge({ text }: { text: string }) {
+  // Generate scrambled chars like Greptile does
+  const scrambleChars = ')*^&.?$`]*$+={#_|';
+  const scrambled = scrambleChars.slice(0, Math.min(text.length, 12));
+
+  return (
+    <p
+      className="text-[14px] font-mono mb-3"
+      style={{ color: C.textSecondary }}
+    >
+      <span style={{ color: C.green }}>[ {text}</span>
+      <span style={{ color: C.textTertiary }}>{scrambled}</span>
+    </p>
+  );
+}
+
+// ============================================================================
+// HERO SECTION — Centered layout matching Greptile exactly
+// H1: 72px, weight 600, line-height 72px, tracking -2.88px, COLOR: GREEN
+// Mascot positioned like Greptile's crow (upper right, overlapping)
+// ============================================================================
+function HeroSection() {
+  const [isEvaluating, setIsEvaluating] = useState(false);
+
+  return (
+    <BorderedContent>
+      <div className="relative overflow-hidden" style={{ paddingTop: '64px', paddingBottom: '64px' }}>
+        {/* Wizard mascot — positioned like Greptile's crow: upper right */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="absolute top-0 right-0 z-10 hidden lg:block"
+          style={{ right: '-20px', top: '-10px' }}
+          onMouseEnter={() => setIsEvaluating(true)}
+          onMouseLeave={() => setIsEvaluating(false)}
+        >
+          <TracedWizard
+            width={380}
+            height={340}
+            isEvaluating={isEvaluating}
+          />
+        </motion.div>
+
+        <div className="px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {/* H1 — Greptile: 72px, 600 weight, line-height 72px, letter-spacing -2.88px, GREEN */}
+            <h1
+              className={`${FONT.display} max-w-[700px]`}
+              style={{
+                fontSize: '72px',
+                fontWeight: 600,
+                lineHeight: '72px',
+                letterSpacing: '-2.88px',
+                color: C.green,
+              }}
+            >
+              The Agent<br />Gatekeeper
+            </h1>
+          </motion.div>
+
+          {/* Eyebrow text — Greptile: geistMono 16px, green, uppercase */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="mt-6"
+          >
+            <p className="text-[16px] font-mono leading-[24px]" style={{ color: C.green }}>
+              AI AGENTS THAT PROVE INTENT
+            </p>
+            <p className="text-[16px] font-mono leading-[24px]" style={{ color: C.green }}>
+              BEFORE SPENDING WITH
+            </p>
+            <p className="text-[16px] font-mono leading-[24px]" style={{ color: C.green }}>
+              FULL CONTEXT OF YOUR POLICY
+            </p>
+          </motion.div>
+
+          {/* CTA — Greptile: green bg, mono 14px, 8px 16px padding, 0 radius */}
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-8"
+          >
+            <Link
+              to="/playground"
+              className="inline-flex items-center gap-2 text-[14px] font-mono px-[16px] py-[8px]"
+              style={{
+                backgroundColor: C.green,
+                color: C.white,
+              }}
+            >
+              Try the Playground
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <p className="text-[14px] font-mono mt-2" style={{ color: C.textSecondary }}>
+              open standard &bull; no account required
+            </p>
+          </motion.div>
+        </div>
+      </div>
+    </BorderedContent>
+  );
+}
+
+// ============================================================================
+// ANIMATED SECTION WRAPPER
+// ============================================================================
+function Section({ children, className = '' }: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
+  return (
+    <BorderedContent>
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5 }}
+        className={`px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-16 lg:py-20 ${className}`}
+      >
+        {children}
+      </motion.div>
+    </BorderedContent>
+  );
+}
+
+// ============================================================================
+// DARK SECTION — for full-width dark background areas
+// ============================================================================
+function DarkSection({ children, className = '' }: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-50px' });
+
+  return (
+    <div
+      className="mx-4 md:mx-8 lg:mx-24 xl:mx-32 border-x"
+      style={{ borderColor: C.border, backgroundColor: C.greenDark }}
+    >
+      <motion.div
+        ref={ref}
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5 }}
+        className={`px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-16 lg:py-20 ${className}`}
+      >
+        {children}
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================================================
+// FEATURE CARD — Greptile style with corner squares
+// Border 1px solid #CCC, no border-radius, corner accents
+// ============================================================================
+function FeatureCard({ title, description, icon: Icon, badge }: {
+  title: string;
+  description: string;
+  icon: React.ElementType;
+  badge?: string;
+}) {
+  return (
+    <div
+      className="relative border p-6 group transition-colors cursor-default"
+      style={{ borderColor: C.border, backgroundColor: 'rgba(255,255,255,0.5)' }}
+      onMouseEnter={e => {
+        e.currentTarget.style.borderColor = C.text;
+        e.currentTarget.querySelectorAll('.corner-sq').forEach(el => {
+          (el as HTMLElement).style.backgroundColor = C.green;
+        });
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.borderColor = C.border;
+        e.currentTarget.querySelectorAll('.corner-sq').forEach(el => {
+          (el as HTMLElement).style.backgroundColor = C.border;
+        });
+      }}
+    >
+      {/* Corner squares — 6x6px, positioned at exact corners */}
+      <div className="corner-sq absolute top-0 left-0 w-[6px] h-[6px] transition-colors duration-200" style={{ backgroundColor: C.border }} />
+      <div className="corner-sq absolute top-0 right-0 w-[6px] h-[6px] transition-colors duration-200" style={{ backgroundColor: C.border }} />
+      <div className="corner-sq absolute bottom-0 left-0 w-[6px] h-[6px] transition-colors duration-200" style={{ backgroundColor: C.border }} />
+      <div className="corner-sq absolute bottom-0 right-0 w-[6px] h-[6px] transition-colors duration-200" style={{ backgroundColor: C.border }} />
+
+      {badge && (
+        <p className="text-[12px] font-mono mb-3" style={{ color: C.green }}>
+          [{badge}]
+        </p>
+      )}
+      <Icon className="w-5 h-5 mb-4" style={{ color: C.green }} />
+      <h3
+        className={`${FONT.display} text-[20px] font-semibold mb-2`}
+        style={{ color: C.text }}
+      >
+        {title}
+      </h3>
+      <p className="text-[14px] leading-[20px]" style={{ color: C.textSecondary }}>
+        {description}
+      </p>
+    </div>
+  );
+}
+
+// ============================================================================
+// SOCIAL PROOF BANNER — Greptile: "1000+ TEAMS..." section
+// ============================================================================
+function SocialProofSection() {
+  return (
+    <Section>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <p className="text-[14px] font-mono" style={{ color: C.text }}>
+          THE OPEN STANDARD FOR AI AGENT TRANSACTION TRUST.
+        </p>
+        <Link
+          to="/spec"
+          className="inline-flex items-center gap-2 text-[14px] font-mono transition-colors"
+          style={{ color: C.textSecondary }}
+          onMouseEnter={e => (e.currentTarget.style.color = C.text)}
+          onMouseLeave={e => (e.currentTarget.style.color = C.textSecondary)}
+        >
+          READ THE SPECIFICATION
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+
+      {/* Partner logos placeholder - Greptile has client logos here */}
+      <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-6">
+        {['VanarChain', 'Agent SDK', 'OpenTrust', 'ChainGuard'].map(name => (
+          <div
+            key={name}
+            className="flex items-center justify-center py-4 text-[14px] font-mono"
+            style={{ color: C.textTertiary }}
+          >
+            {name}
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+// ============================================================================
+// FEATURES SECTION — "Your second pair of eyes" / "Your transaction gatekeeper"
+// Greptile: H2 48px tasaOrbiter, 2x2 feature card grid
 // ============================================================================
 function FeaturesSection() {
   return (
     <Section>
-      {/* Header */}
+      {/* Header — Greptile style */}
       <div className="mb-12">
-        <p className="text-sm font-mono text-[#2F6B4F] mb-3">[ THE PROTOCOL ]</p>
-        <h2 className="text-4xl font-medium text-[#1A1A1A] mb-4">Your transaction gatekeeper.</h2>
-        <p className="text-lg text-[#6B6B6B] max-w-2xl">
+        <SectionBadge text="THE PROTOCOL" />
+        <h2
+          className={`${FONT.display} mb-4`}
+          style={{
+            fontSize: '48px',
+            fontWeight: 600,
+            color: C.text,
+          }}
+        >
+          Your transaction gatekeeper.
+        </h2>
+        <p className="text-[16px] max-w-2xl" style={{ color: C.textSecondary }}>
           xBPP evaluates every agent transaction against your policy before execution.
         </p>
       </div>
-      
-      {/* 2x2 Feature Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FeatureCard 
+
+      {/* Greptile-style "See in action" button */}
+      <div className="mb-8">
+        <Link
+          to="/playground"
+          className="hover-btn"
+        >
+          See xBPP in action
+        </Link>
+      </div>
+
+      {/* 2x2 Feature Grid — matching Greptile's feature cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t" style={{ borderColor: C.border }}>
+        <FeatureCard
           icon={Shield}
+          badge="EVALUATION"
           title="9-Phase Evaluation"
           description="Every transaction passes through identity, scope, limits, risk, anomaly, context, escalation, audit, and verdict phases."
         />
-        <FeatureCard 
+        <FeatureCard
           icon={FileText}
+          badge="POLICY"
           title="Policy-as-Code"
           description="Define your trust boundaries in code. Version control your agent permissions like infrastructure."
         />
-        <FeatureCard 
+        <FeatureCard
           icon={Eye}
+          badge="MONITORING"
           title="Real-time Monitoring"
           description="Watch transactions flow through evaluation. See exactly why each was allowed, blocked, or escalated."
         />
-        <FeatureCard 
+        <FeatureCard
           icon={Users}
+          badge="ESCALATION"
           title="Human Escalation"
           description="High-risk transactions route to human approval. You stay in control of what matters."
         />
@@ -248,44 +531,69 @@ function FeaturesSection() {
 }
 
 // ============================================================================
-// SECTION: Full Codebase Context (Dark section with visualization)
+// CONTEXT SECTION — Dark background, trust visualization
 // ============================================================================
 function ContextSection() {
   return (
-    <Section dark>
+    <DarkSection>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
-          <p className="text-sm font-mono text-[#3ECFA5] mb-3">[ FULL CONTEXT ]</p>
-          <h2 className="text-4xl font-medium text-white mb-4">Trust is the product.</h2>
-          <p className="text-lg text-gray-400 mb-6 leading-relaxed">
-            In the near future, no autonomous agent will execute a transaction 
+          <p className="text-[14px] font-mono mb-3" style={{ color: '#3ECFA5' }}>
+            [ FULL CONTEXT
+            <span style={{ color: 'rgba(255,255,255,0.3)' }}> +/%|+)!&lt;{'}'}</span>
+          </p>
+          <h2
+            className={FONT.display}
+            style={{
+              fontSize: '48px',
+              fontWeight: 600,
+              color: C.white,
+            }}
+          >
+            Trust is the product.
+          </h2>
+          <p className="text-[16px] mt-4 mb-6 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            In the near future, no autonomous agent will execute a transaction
             without a trust receipt. xBPP is building that future.
           </p>
+
+          {/* Checklist — Greptile style */}
           <ul className="space-y-3">
             {[
               'Immutable audit trail for every decision',
               'Cryptographic proof of policy compliance',
               'On-chain verification via VanarChain',
             ].map((item, i) => (
-              <li key={i} className="flex items-center gap-3 text-gray-300">
-                <Check className="w-5 h-5 text-[#3ECFA5]" />
+              <li key={i} className="flex items-center gap-3 text-[14px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                <Check className="w-5 h-5 flex-shrink-0" style={{ color: '#3ECFA5' }} />
                 {item}
               </li>
             ))}
           </ul>
+
+          <div className="mt-8">
+            <Link
+              to="/spec"
+              className="inline-flex items-center gap-2 text-[14px] font-mono px-[16px] py-[8px]"
+              style={{ backgroundColor: '#3ECFA5', color: C.greenDark }}
+            >
+              <ArrowRight className="w-4 h-4" />
+              Learn more
+            </Link>
+          </div>
         </div>
-        
-        {/* Network visualization placeholder */}
+
+        {/* Network visualization */}
         <div className="relative h-80 flex items-center justify-center">
           <div className="absolute inset-0 flex items-center justify-center">
-            {/* Animated circles representing trust network */}
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="absolute border border-[#3ECFA5]/30 rounded-full"
+                className="absolute rounded-full"
                 style={{
                   width: 150 + i * 80,
                   height: 150 + i * 80,
+                  border: '1px solid rgba(62, 207, 165, 0.2)',
                 }}
                 animate={{
                   scale: [1, 1.05, 1],
@@ -298,72 +606,117 @@ function ContextSection() {
                 }}
               />
             ))}
-            <div className="relative z-10 w-16 h-16 bg-[#3ECFA5] rounded-full flex items-center justify-center">
+            <div
+              className="relative z-10 w-16 h-16 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: '#3ECFA5' }}
+            >
               <Shield className="w-8 h-8 text-white" />
             </div>
           </div>
         </div>
       </div>
-    </Section>
+    </DarkSection>
   );
 }
 
 // ============================================================================
-// SECTION: Your house, your rules (Policy examples)
+// POLICY SECTION — "Your house, your rules."
+// Greptile: split layout with code editor + explanation
 // ============================================================================
 function PolicySection() {
   return (
     <Section>
-      <div className="mb-12">
-        <p className="text-sm font-mono text-[#2F6B4F] mb-3">[ YOUR RULES ]</p>
-        <h2 className="text-4xl font-medium text-[#1A1A1A] mb-4">Your house, your rules.</h2>
-        <p className="text-lg text-[#6B6B6B] max-w-2xl">
-          Define exactly what your agents can and cannot do. Every transaction is evaluated against your policy.
-        </p>
-      </div>
-      
-      {/* Policy examples */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="border border-[#E5E5E0] bg-[#1A1A1A] rounded overflow-hidden">
-          <div className="px-4 py-2 border-b border-gray-800 flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="text-xs text-gray-500 ml-2 font-mono">policy.yaml</span>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div>
+          <SectionBadge text="CUSTOM CONTEXT" />
+          <h2
+            className={FONT.display}
+            style={{
+              fontSize: '48px',
+              fontWeight: 600,
+              color: C.text,
+            }}
+          >
+            Your house, your rules.
+          </h2>
+          <p className="text-[16px] mt-4 mb-8" style={{ color: C.textSecondary }}>
+            xBPP is better when personalized to your team.
+          </p>
+
+          {/* Feature list — Greptile style with numbered items */}
+          <div className="space-y-6">
+            {[
+              {
+                icon: FileText,
+                title: 'Write policies in YAML or point to a config',
+                desc: 'Define spending limits, scope restrictions, and escalation rules in a simple config file.',
+              },
+              {
+                icon: GitBranch,
+                title: 'Scope policies by agent or context',
+                desc: 'Apply different trust boundaries to different agents, environments, or transaction types.',
+              },
+              {
+                icon: Eye,
+                title: 'Track policy effectiveness over time',
+                desc: 'Analyze whether policies are catching real issues or need adjustment.',
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="flex items-start gap-4 cursor-pointer group"
+              >
+                <item.icon className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: C.green }} />
+                <div>
+                  <h5
+                    className="text-[16px] font-semibold mb-1 transition-colors"
+                    style={{ color: C.text }}
+                  >
+                    {item.title}
+                  </h5>
+                  <p className="text-[14px]" style={{ color: C.textSecondary }}>
+                    {item.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
-          <pre className="p-4 text-sm text-gray-300 font-mono overflow-x-auto">
+
+          <div className="mt-8">
+            <Link to="/spec" className="hover-btn">
+              Explore Policies
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Code editor — Greptile style */}
+        <div className="border overflow-hidden" style={{ borderColor: C.border, backgroundColor: '#0A0A0A' }}>
+          <div className="px-4 py-2 border-b flex items-center gap-2" style={{ borderColor: '#333' }}>
+            <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
+            <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+            <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+            <span className="text-[12px] font-mono ml-2" style={{ color: '#666' }}>policy.yaml</span>
+          </div>
+          <pre className="p-4 text-[13px] leading-[20px] font-mono overflow-x-auto" style={{ color: '#E0E0E0' }}>
 {`posture: BALANCED
 
 limits:
   daily_spend: 1000 USDC
   single_tx: 100 USDC
-  
+
 escalation:
   threshold: 50 USDC
   require: human_approval
-  
+
 block:
   - unknown_counterparty
-  - after_hours`}
+  - after_hours
+
+audit:
+  store: vanarchain
+  retention: 90d`}
           </pre>
-        </div>
-        
-        <div className="border border-[#E5E5E0] bg-white/50 p-6">
-          <h3 className="text-lg font-medium text-[#1A1A1A] mb-4">What this policy does:</h3>
-          <ul className="space-y-3 text-sm text-[#6B6B6B]">
-            <li className="flex items-start gap-3">
-              <Check className="w-4 h-4 text-[#2F6B4F] mt-0.5 flex-shrink-0" />
-              <span>Allows up to $1,000/day in agent spending</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-              <span>Escalates any transaction over $50 to human approval</span>
-            </li>
-            <li className="flex items-start gap-3">
-              <Lock className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-              <span>Blocks transactions to unknown parties or outside business hours</span>
-            </li>
-          </ul>
         </div>
       </div>
     </Section>
@@ -371,35 +724,68 @@ block:
 }
 
 // ============================================================================
-// SECTION: How it works (9 phases)
+// HOW IT WORKS — 9 phases (Greptile-style data section)
 // ============================================================================
 function HowItWorksSection() {
   const phases = [
-    { num: 1, name: 'Identity Check', desc: 'Verify agent credentials' },
-    { num: 2, name: 'Scope Match', desc: 'Confirm action is permitted' },
-    { num: 3, name: 'Limit Check', desc: 'Validate spending caps' },
-    { num: 4, name: 'Risk Score', desc: 'Calculate exposure' },
-    { num: 5, name: 'Anomaly Scan', desc: 'Detect deviations' },
-    { num: 6, name: 'Context Window', desc: 'Evaluate patterns' },
-    { num: 7, name: 'Escalation', desc: 'Route if needed' },
-    { num: 8, name: 'Audit Log', desc: 'Record decision' },
-    { num: 9, name: 'Verdict', desc: 'ALLOW / BLOCK / ESCALATE' },
+    { num: 1, name: 'Identity', desc: 'Verify agent credentials' },
+    { num: 2, name: 'Scope', desc: 'Confirm action permitted' },
+    { num: 3, name: 'Limits', desc: 'Validate spending caps' },
+    { num: 4, name: 'Risk', desc: 'Calculate exposure' },
+    { num: 5, name: 'Anomaly', desc: 'Detect deviations' },
+    { num: 6, name: 'Context', desc: 'Evaluate patterns' },
+    { num: 7, name: 'Escalate', desc: 'Route if needed' },
+    { num: 8, name: 'Audit', desc: 'Record decision' },
+    { num: 9, name: 'Verdict', desc: 'ALLOW / BLOCK' },
   ];
 
   return (
     <Section>
-      <div className="mb-12 text-center">
-        <p className="text-sm font-mono text-[#2F6B4F] mb-3">[ THE 9 PHASES ]</p>
-        <h2 className="text-4xl font-medium text-[#1A1A1A] mb-4">How xBPP evaluates transactions</h2>
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-12">
+        <div>
+          <SectionBadge text="THE 9 PHASES" />
+          <h2
+            className={FONT.display}
+            style={{
+              fontSize: '48px',
+              fontWeight: 600,
+              color: C.text,
+            }}
+          >
+            How xBPP evaluates transactions.
+          </h2>
+        </div>
+        <Link to="/spec" className="hover-btn mt-4 md:mt-0">
+          <ArrowRight className="w-4 h-4 mr-2" />
+          View full spec
+        </Link>
       </div>
-      
-      <div className="grid grid-cols-3 md:grid-cols-9 gap-4">
+
+      {/* Phase grid — horizontal strip */}
+      <div
+        className="grid grid-cols-3 md:grid-cols-9 border-t"
+        style={{ borderColor: C.border }}
+      >
         {phases.map((phase) => (
-          <div key={phase.num} className="text-center">
-            <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-[#2F6B4F]/10 flex items-center justify-center text-[#2F6B4F] font-mono font-medium">
+          <div
+            key={phase.num}
+            className="border-b border-r px-3 py-4 text-center group transition-colors"
+            style={{ borderColor: C.border }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(16,122,77,0.05)')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+          >
+            <div
+              className="text-[20px] font-mono font-medium mb-1"
+              style={{ color: C.green }}
+            >
               {phase.num}
             </div>
-            <p className="text-xs font-medium text-[#1A1A1A]">{phase.name}</p>
+            <p className="text-[12px] font-semibold" style={{ color: C.text }}>
+              {phase.name}
+            </p>
+            <p className="text-[11px] mt-0.5 hidden md:block" style={{ color: C.textSecondary }}>
+              {phase.desc}
+            </p>
           </div>
         ))}
       </div>
@@ -408,57 +794,57 @@ function HowItWorksSection() {
 }
 
 // ============================================================================
-// SECTION: Who it's for
+// SECURITY SECTION — Greptile: "Security-First Design"
 // ============================================================================
-function AudienceSection() {
-  const audiences = [
-    { title: 'AI Agent Developers', desc: 'Ship agents that prove their intent', icon: Code },
-    { title: 'Payment Providers', desc: 'Add trust verification to agent transactions', icon: Cpu },
-    { title: 'Enterprises', desc: 'Govern AI spending with policy-as-code', icon: Database },
-    { title: 'Compliance Teams', desc: 'Immutable audit trails for every decision', icon: FileText },
-  ];
-
+function SecuritySection() {
   return (
     <Section>
-      <div className="mb-12 text-center">
-        <p className="text-sm font-mono text-[#2F6B4F] mb-3">[ WHO IT'S FOR ]</p>
-        <h2 className="text-4xl font-medium text-[#1A1A1A]">Built for builders who know how systems behave.</h2>
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-8">
+        <div>
+          <SectionBadge text="SECURITY" />
+          <h2
+            className={FONT.display}
+            style={{
+              fontSize: '48px',
+              fontWeight: 600,
+              color: C.text,
+            }}
+          >
+            Security-First Design
+          </h2>
+        </div>
+        <Link to="/spec" className="hover-btn mt-4 md:mt-0">
+          View our security model
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </Link>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {audiences.map((item, i) => (
-          <FeatureCard key={i} icon={item.icon} title={item.title} description={item.desc} />
-        ))}
-      </div>
-    </Section>
-  );
-}
 
-// ============================================================================
-// SECTION: CTA
-// ============================================================================
-function CTASection() {
-  return (
-    <Section>
-      <div className="text-center py-8">
-        <h2 className="text-4xl md:text-5xl font-medium text-[#1A1A1A] mb-6">
-          Build agents worth trusting.
-        </h2>
-        <div className="flex justify-center gap-4">
-          <Link 
-            to="/playground"
-            className="inline-flex items-center gap-2 bg-[#2F6B4F] text-white px-6 py-3 rounded text-sm font-medium hover:bg-[#3D8B6A] transition-colors"
+      <hr style={{ borderColor: C.border }} className="mb-8" />
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div>
+          <h3
+            className={`${FONT.display} text-[24px] font-semibold mb-2`}
+            style={{ color: C.text }}
           >
-            <Zap className="w-4 h-4" />
-            Try the Playground
-          </Link>
-          <Link 
-            to="/spec"
-            className="inline-flex items-center gap-2 border border-[#E5E5E0] text-[#1A1A1A] px-6 py-3 rounded text-sm font-medium hover:bg-white/50 transition-colors"
+            On-Chain Verification
+          </h3>
+          <p className="text-[14px] leading-[20px]" style={{ color: C.textSecondary }}>
+            Every evaluation verdict is cryptographically signed and recorded on VanarChain.
+            Tamper-proof audit trails for complete transparency.
+          </p>
+        </div>
+        <div>
+          <h3
+            className={`${FONT.display} text-[24px] font-semibold mb-2`}
+            style={{ color: C.text }}
           >
-            Read the Full Spec
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+            Zero-Trust Architecture
+          </h3>
+          <p className="text-[14px] leading-[20px]" style={{ color: C.textSecondary }}>
+            No implicit trust. Every agent must prove identity, scope, and intent
+            before any transaction is permitted to execute.
+          </p>
         </div>
       </div>
     </Section>
@@ -466,11 +852,53 @@ function CTASection() {
 }
 
 // ============================================================================
-// FAQ Section
+// AUDIENCE SECTION — "Built for builders"
+// ============================================================================
+function AudienceSection() {
+  const audiences = [
+    { title: 'AI Agent Developers', desc: 'Ship agents that prove their intent before spending.', icon: Code, badge: 'DEVELOPERS' },
+    { title: 'Payment Providers', desc: 'Add trust verification to agent transactions.', icon: Cpu, badge: 'PAYMENTS' },
+    { title: 'Enterprises', desc: 'Govern AI spending with policy-as-code controls.', icon: Database, badge: 'ENTERPRISE' },
+    { title: 'Compliance Teams', desc: 'Immutable audit trails for every agent decision.', icon: FileText, badge: 'COMPLIANCE' },
+  ];
+
+  return (
+    <Section>
+      <div className="mb-12">
+        <SectionBadge text="WHO IT'S FOR" />
+        <h2
+          className={`${FONT.display} max-w-3xl`}
+          style={{
+            fontSize: '48px',
+            fontWeight: 600,
+            color: C.text,
+          }}
+        >
+          Built for builders who know how systems behave.
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 border-t" style={{ borderColor: C.border }}>
+        {audiences.map((item, i) => (
+          <FeatureCard
+            key={i}
+            icon={item.icon}
+            title={item.title}
+            description={item.desc}
+            badge={item.badge}
+          />
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+// ============================================================================
+// FAQ SECTION — Greptile: accordion style
 // ============================================================================
 function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  
+
   const faqs = [
     {
       q: 'What is xBPP?',
@@ -492,83 +920,250 @@ function FAQSection() {
 
   return (
     <Section>
-      <div className="mb-12">
-        <p className="text-sm font-mono text-[#2F6B4F] mb-3">[ FAQ ]</p>
-        <h2 className="text-4xl font-medium text-[#1A1A1A]">Frequently Asked Questions</h2>
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-12">
+        <div>
+          <SectionBadge text="FAQ" />
+          <h2
+            className={FONT.display}
+            style={{
+              fontSize: '48px',
+              fontWeight: 600,
+              color: C.text,
+            }}
+          >
+            Frequently Asked Questions
+          </h2>
+        </div>
+        <div className="mt-4 md:mt-0">
+          <p className="text-[14px]" style={{ color: C.textSecondary }}>
+            Your question not answered here?
+          </p>
+          <Link to="/spec" className="hover-btn mt-2">
+            <ArrowRight className="w-4 h-4 mr-2" />
+            Contact Us
+          </Link>
+        </div>
       </div>
-      
-      <div className="max-w-3xl mx-auto space-y-4">
+
+      <div className="space-y-0">
         {faqs.map((faq, i) => (
-          <div key={i} className="border border-[#E5E5E0] rounded">
+          <div key={i} className="border-t" style={{ borderColor: C.border }}>
             <button
               onClick={() => setOpenIndex(openIndex === i ? null : i)}
-              className="w-full flex items-center justify-between p-4 text-left"
+              className="w-full flex items-center justify-between py-5 text-left group"
             >
-              <span className="font-medium text-[#1A1A1A]">{faq.q}</span>
-              <ChevronDown className={`w-5 h-5 text-[#6B6B6B] transition-transform ${openIndex === i ? 'rotate-180' : ''}`} />
+              <h3
+                className={`${FONT.display} text-[20px] font-semibold`}
+                style={{ color: C.text }}
+              >
+                {faq.q}
+              </h3>
+              <ChevronDown
+                className={`w-5 h-5 flex-shrink-0 ml-4 transition-transform duration-200 ${openIndex === i ? 'rotate-180' : ''}`}
+                style={{ color: C.textSecondary }}
+              />
             </button>
             {openIndex === i && (
-              <div className="px-4 pb-4 text-[#6B6B6B]">
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                transition={{ duration: 0.2 }}
+                className="pb-5 text-[14px] leading-[22px]"
+                style={{ color: C.textSecondary }}
+              >
                 {faq.a}
-              </div>
+              </motion.div>
             )}
           </div>
         ))}
+        <div className="border-t" style={{ borderColor: C.border }} />
       </div>
     </Section>
   );
 }
 
 // ============================================================================
-// FOOTER
+// CTA SECTION — Greptile: "Tell your CTO about Greptile"
+// ============================================================================
+function CTASection() {
+  return (
+    <Section>
+      <div className="mb-8">
+        <SectionBadge text="GET STARTED" />
+        <h2
+          className={FONT.display}
+          style={{
+            fontSize: '48px',
+            fontWeight: 600,
+            color: C.text,
+          }}
+        >
+          Build agents worth trusting.
+        </h2>
+        <p className="text-[16px] mt-4" style={{ color: C.textSecondary }}>
+          Start with the playground, read the spec, or integrate today.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-3">
+        <Link
+          to="/playground"
+          className="inline-flex items-center gap-2 text-[14px] font-mono px-[16px] py-[8px]"
+          style={{ backgroundColor: C.green, color: C.white }}
+        >
+          Try the Playground
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+        <Link to="/spec" className="hover-btn">
+          Read the Full Spec
+          <ArrowRight className="w-4 h-4 ml-2" />
+        </Link>
+      </div>
+
+      <p className="text-[14px] font-mono mt-4" style={{ color: C.textTertiary }}>
+        open standard &bull; no account required &bull; built on VanarChain
+      </p>
+    </Section>
+  );
+}
+
+// ============================================================================
+// FOOTER — Greptile: multi-column, mono links, h6 headings
 // ============================================================================
 function Footer() {
   return (
-    <footer className="border-t border-[#E5E5E0] bg-[#F5F4F0]">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Logo */}
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Shield className="w-6 h-6 text-[#2F6B4F]" />
-              <span className="font-semibold text-[#1A1A1A]">xBPP</span>
+    <footer>
+      <BorderedContent>
+        <div className="px-6 sm:px-8 md:px-12 lg:px-16 xl:px-20 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
+            {/* Logo */}
+            <div className="md:col-span-2">
+              <Link to="/" className="flex items-center gap-2 mb-4">
+                <Shield className="w-6 h-6" style={{ color: C.green }} />
+                <span className={`${FONT.display} text-[20px]`} style={{ color: C.text }}>
+                  xBPP
+                </span>
+              </Link>
+              <p className="text-[14px] max-w-[280px]" style={{ color: C.textSecondary }}>
+                The Execution Boundary Permission Protocol — an open standard for AI agent transaction trust.
+              </p>
             </div>
-            <p className="text-sm text-[#6B6B6B]">
-              The Execution Boundary Permission Protocol
+
+            {/* Links columns — Greptile: h6 18px 600 weight, links 14px mono */}
+            <div>
+              <h6
+                className="text-[14px] font-semibold mb-3"
+                style={{ color: C.text }}
+              >
+                Protocol
+              </h6>
+              <ul className="space-y-2">
+                {[
+                  { label: 'Specification', to: '/spec' },
+                  { label: 'Playground', to: '/playground' },
+                  { label: 'Library', to: '/library' },
+                  { label: 'Test Suite', to: '/test-suite' },
+                ].map(link => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.to}
+                      className="text-[14px] font-mono transition-colors"
+                      style={{ color: C.textSecondary }}
+                      onMouseEnter={e => (e.currentTarget.style.color = C.text)}
+                      onMouseLeave={e => (e.currentTarget.style.color = C.textSecondary)}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h6
+                className="text-[14px] font-semibold mb-3"
+                style={{ color: C.text }}
+              >
+                Resources
+              </h6>
+              <ul className="space-y-2">
+                {[
+                  { label: 'GitHub', href: 'https://github.com/vanarchain/xbpp' },
+                  { label: 'VanarChain', href: 'https://vanarchain.com' },
+                  { label: 'Documentation', to: '/spec' },
+                ].map(link => (
+                  <li key={link.label}>
+                    {link.to ? (
+                      <Link
+                        to={link.to}
+                        className="text-[14px] font-mono transition-colors"
+                        style={{ color: C.textSecondary }}
+                        onMouseEnter={e => (e.currentTarget.style.color = C.text)}
+                        onMouseLeave={e => (e.currentTarget.style.color = C.textSecondary)}
+                      >
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <a
+                        href={link.href}
+                        className="text-[14px] font-mono transition-colors"
+                        style={{ color: C.textSecondary }}
+                        onMouseEnter={e => (e.currentTarget.style.color = C.text)}
+                        onMouseLeave={e => (e.currentTarget.style.color = C.textSecondary)}
+                      >
+                        {link.label}
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h6
+                className="text-[14px] font-semibold mb-3"
+                style={{ color: C.text }}
+              >
+                Company
+              </h6>
+              <ul className="space-y-2">
+                <li>
+                  <a
+                    href="https://vanarchain.com"
+                    className="text-[14px] font-mono transition-colors"
+                    style={{ color: C.textSecondary }}
+                    onMouseEnter={e => (e.currentTarget.style.color = C.text)}
+                    onMouseLeave={e => (e.currentTarget.style.color = C.textSecondary)}
+                  >
+                    About
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom bar — Greptile: socials left, copyright right */}
+          <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4" style={{ borderColor: C.border }}>
+            <div className="flex items-center gap-4">
+              <span className="text-[12px] font-mono" style={{ color: C.textTertiary }}>
+                SOCIALS
+              </span>
+              <a
+                href="https://github.com/vanarchain/xbpp"
+                className="text-[14px] font-mono transition-colors"
+                style={{ color: C.textSecondary }}
+                onMouseEnter={e => (e.currentTarget.style.color = C.text)}
+                onMouseLeave={e => (e.currentTarget.style.color = C.textSecondary)}
+              >
+                GitHub
+              </a>
+            </div>
+            <p className="text-[14px] font-mono" style={{ color: C.textTertiary }}>
+              &copy; 2026 VanarChain. All rights reserved.
             </p>
           </div>
-          
-          {/* Links */}
-          <div>
-            <h4 className="font-medium text-[#1A1A1A] mb-3">Protocol</h4>
-            <ul className="space-y-2 text-sm text-[#6B6B6B]">
-              <li><Link to="/spec" className="hover:text-[#1A1A1A]">Specification</Link></li>
-              <li><Link to="/playground" className="hover:text-[#1A1A1A]">Playground</Link></li>
-              <li><Link to="/library" className="hover:text-[#1A1A1A]">Library</Link></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-medium text-[#1A1A1A] mb-3">Resources</h4>
-            <ul className="space-y-2 text-sm text-[#6B6B6B]">
-              <li><a href="https://github.com/vanarchain/xbpp" className="hover:text-[#1A1A1A]">GitHub</a></li>
-              <li><a href="https://vanarchain.com" className="hover:text-[#1A1A1A]">VanarChain</a></li>
-            </ul>
-          </div>
-          
-          <div>
-            <h4 className="font-medium text-[#1A1A1A] mb-3">Company</h4>
-            <ul className="space-y-2 text-sm text-[#6B6B6B]">
-              <li><a href="https://vanarchain.com" className="hover:text-[#1A1A1A]">About</a></li>
-            </ul>
-          </div>
         </div>
-        
-        <div className="mt-12 pt-8 border-t border-[#E5E5E0] flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-[#9B9B9B]">© 2026 VanarChain. All rights reserved.</p>
-          <p className="text-sm text-[#9B9B9B]">Built on VanarChain</p>
-        </div>
-      </div>
+      </BorderedContent>
     </footer>
   );
 }
@@ -578,24 +1173,29 @@ function Footer() {
 // ============================================================================
 export default function LandingV3() {
   return (
-    <div className="min-h-screen bg-[#F5F4F0]">
+    <div className="min-h-screen scroll-smooth" style={{ backgroundColor: C.bg, fontFamily: 'Inter, sans-serif' }}>
       <Navbar />
       <main>
         <HeroSection />
-        <hr className="border-[#E5E5E0] mx-6 lg:mx-12" />
+        <Separator />
+        <SocialProofSection />
+        <Separator />
         <FeaturesSection />
-        <hr className="border-[#E5E5E0] mx-6 lg:mx-12" />
+        <Separator />
         <ContextSection />
-        <hr className="border-[#E5E5E0] mx-6 lg:mx-12" />
+        <Separator />
         <PolicySection />
-        <hr className="border-[#E5E5E0] mx-6 lg:mx-12" />
+        <Separator />
         <HowItWorksSection />
-        <hr className="border-[#E5E5E0] mx-6 lg:mx-12" />
+        <Separator />
+        <SecuritySection />
+        <Separator />
         <AudienceSection />
-        <hr className="border-[#E5E5E0] mx-6 lg:mx-12" />
+        <Separator />
         <FAQSection />
-        <hr className="border-[#E5E5E0] mx-6 lg:mx-12" />
+        <Separator />
         <CTASection />
+        <Separator />
       </main>
       <Footer />
     </div>
