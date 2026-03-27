@@ -36,6 +36,9 @@ const LibraryIndex = lazy(() => import("./pages/library/index"));
 const ReasonCodes = lazy(() => import("./pages/library/ReasonCodes"));
 const Agents = lazy(() => import("./pages/library/Agents"));
 
+// Visualization demo
+const VisualizationDemo = lazy(() => import("./pages/VisualizationDemo"));
+
 const queryClient = new QueryClient();
 
 const pageVariants = {
@@ -90,6 +93,9 @@ function AnimatedRoutes() {
             {/* Spec & Tools */}
             <Route path="/spec" element={<Spec />} />
             <Route path="/test-suite" element={<TestSuite />} />
+            
+            {/* Visualization Demo */}
+            <Route path="/viz" element={<VisualizationDemo />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
