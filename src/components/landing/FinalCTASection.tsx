@@ -66,13 +66,31 @@ export function FinalCTASection() {
           "transition-all duration-700 delay-400",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         )}>
-          <Link
-            to="/scenarios"
-            className="btn-primary inline-flex items-center gap-3 text-lg px-10 py-5"
-          >
-            Run a simulation
-            <ArrowRight className="h-5 w-5" />
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              to="/spec"
+              className="btn-primary inline-flex items-center gap-3 text-lg px-10 py-5"
+            >
+              Read the spec
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+            <Link
+              to="/playground"
+              className="inline-flex items-center gap-3 text-lg px-10 py-5 border-2"
+              style={{ borderColor: '#03D9AF', color: '#0f131f', fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              Run playground
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+            <Link
+              to="/learn/quick-start"
+              className="inline-flex items-center gap-3 text-lg px-10 py-5 border-2"
+              style={{ borderColor: '#9aa0ae', color: '#34384a', fontFamily: "'JetBrains Mono', monospace" }}
+            >
+              Start quick start
+              <ArrowRight className="h-5 w-5" />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

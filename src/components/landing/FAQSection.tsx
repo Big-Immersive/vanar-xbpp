@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     question: 'How do I add spending limits to AI agents?',
-    answer: 'Install @vanarchain/xbpp (coming soon to npm), create a policy with your limits (max_single, max_daily, require_human_above), and wrap your x402 client. Every transaction is checked before execution. Setup takes under 60 seconds.',
+    answer: 'Use the public reference repository today (github.com/jawaddxb/xbpp-sdk), create a policy with your limits (max_single, max_daily, require_human_above), and wrap your x402 client. Every transaction is checked before execution. The npm package will be published after v1 stabilization.',
   },
   {
     question: 'What is the difference between xBPP and x402?',
@@ -33,8 +33,12 @@ const faqs = [
   },
   {
     question: 'Is xBPP open source?',
-    answer: 'Yes. xBPP is an open standard with an open-source reference implementation. The specification, SDK, policy templates, and test suite are all freely available and open to contribution.',
+    answer: 'Yes. xBPP is an open standard with an open-source reference implementation. The specification, reference flow, policy templates, and test suite are publicly inspectable and open to contribution.',
   },
+  {
+    question: 'Is xBPP production-ready?',
+    answer: 'xBPP v1 is publicly released as an open standard with a working verification stack (spec, playground, tests, and reference flow). Teams should adopt progressively: start in simulation mode, calibrate policies, then enforce in production with staged rollouts.',
+  }
 ];
 
 export function FAQSection() {

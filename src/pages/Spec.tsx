@@ -768,44 +768,46 @@ export default function Spec() {
               </h2>
               
               {/* Reference Implementation Notice */}
-              <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-                <span className="mt-0.5 text-base">⚠️</span>
+              <div className="mb-6 flex items-start gap-3 rounded-lg border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-900">
+                <span className="mt-0.5 text-base">✅</span>
                 <div>
-                  <span className="font-semibold">Reference implementation in development.</span> The API shown below represents the planned SDK surface. The <code className="rounded bg-amber-100 px-1 font-mono text-xs">@vanarchain/xbpp</code> package will be published to npm once the reference implementation is complete. Code samples are illustrative of the intended API design.
+                  <span className="font-semibold">Reference flow is public now.</span> xBPP v1 launches with a verification stack: spec, playground, tests, and reference source. The <code className="rounded bg-teal-100 px-1 font-mono text-xs">@vanarchain/xbpp</code> npm package is scheduled after v1 stabilization.
                 </div>
               </div>
 
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-3">Installation <span className="ml-2 text-xs font-normal text-muted-foreground">(coming soon)</span></h3>
-                  <CodeBlock code="npm install @vanarchain/xbpp" language="bash" />
+                  <h3 className="text-lg font-medium mb-3">Launch-Phase Installation</h3>
+                  <CodeBlock code={`git clone https://github.com/jawaddxb/xbpp-sdk.git
+cd xbpp-sdk
+pnpm install
+pnpm build`} language="bash" />
                 </div>
                 
                 <div>
-                  <h3 className="text-lg font-medium mb-3">30-Second Integration</h3>
-                  <CodeBlock code={`import { xbpp } from '@vanarchain/xbpp';
+                  <h3 className="text-lg font-medium mb-3">Reference Integration Pattern</h3>
+                  <CodeBlock code={`// Illustrative API shape (v1 reference flow)
+import { xbpp } from '@vanarchain/xbpp';
 import { x402Client } from '@coinbase/x402';
 
-// Wrap your x402 client with xBPP protection
 const client = xbpp.wrap(x402Client, {
-  maxSingle: 100,      // Max $100 per transaction
-  dailyBudget: 1000,   // Max $1000 per day
-  askMeAbove: 500,     // Human approval over $500
+  maxSingle: 100,
+  dailyBudget: 1000,
+  askMeAbove: 500,
 });
 
-// All payments now go through xBPP
 const response = await client.fetch(url);`} />
                 </div>
                 
                 <div>
                   <h3 className="text-lg font-medium mb-3">Handling Decisions</h3>
                   <CodeBlock code={`switch (verdict.decision) {
-  case 'ALLOW':    // ✅ Proceed - payment is within policy
+  case 'ALLOW':
     break;
-  case 'BLOCK':    // 🛑 Stop - policy violation
+  case 'BLOCK':
     console.log('Blocked:', verdict.reasons);
     break;
-  case 'ESCALATE': // ⏸️ Pause - needs human approval
+  case 'ESCALATE':
     await handleEscalation(verdict);
     break;
 }`} />
@@ -820,12 +822,7 @@ try {
 } catch (error) {
   if (error instanceof BlockedError) {
     console.log('Payment blocked');
-    console.log('Reasons:', error.reasons); // ['EXCEEDS_DAILY_LIMIT']
-    console.log('Message:', error.message); // Human-readable
-    
-    if (error.reasons.includes('EXCEEDS_DAILY_LIMIT')) {
-      showToast('Daily spending limit reached. Try again tomorrow.');
-    }
+    console.log('Reasons:', error.reasons);
   } else {
     throw error;
   }

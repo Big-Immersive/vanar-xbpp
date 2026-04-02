@@ -74,17 +74,20 @@ export function HeroSection() {
             </div>
 
             {/* Right CTA - Desktop */}
-            <span
-              className="hidden lg:flex items-center gap-2 px-5 py-2.5 text-sm font-semibold tracking-wider uppercase text-white opacity-40 cursor-not-allowed select-none"
+            <a
+              href="https://github.com/jawaddxb/xbpp-sdk"
+              target="_blank"
+              rel="noreferrer"
+              className="hidden lg:flex items-center gap-2 px-5 py-2.5 text-sm font-semibold tracking-wider uppercase text-white transition-opacity hover:opacity-90"
               style={{
-                background: 'linear-gradient(135deg, #9ca3af, #6b7280)',
+                background: 'linear-gradient(135deg, #03D9AF, #029a7d)',
                 clipPath: 'polygon(10px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 10px)',
               }}
-              title="github.com/Big-Immersive/xbpp-sdk"
+              title="View xbpp-sdk source"
             >
               <Github className="h-4 w-4" />
-              SDK Coming Soon
-            </span>
+              View SDK Source
+            </a>
 
             {/* Mobile Menu Button */}
             <button
@@ -207,6 +210,13 @@ export function HeroSection() {
             <div className="feature-dot">Payment-rail agnostic</div>
             <div className="feature-dot">Chain agnostic</div>
           </div>
+
+          <p
+            className={`mb-10 text-sm transition-all duration-500 delay-275 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+            style={{ color: '#6B6F7D', fontFamily: "'JetBrains Mono', monospace" }}
+          >
+            Public now: Spec • Playground • Test Suite • Reference Flow
+          </p>
 
           {/* CTA Buttons */}
           <div

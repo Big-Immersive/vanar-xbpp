@@ -8,10 +8,13 @@ import { cn } from '@/lib/utils';
 
 const steps = [
   {
-    title: 'Install the SDK',
-    description: 'Add xBPP to your project with a single command.',
-    code: 'npm install @vanarchain/xbpp  # coming soon',
-    time: '10 seconds',
+    title: 'Get the Reference SDK',
+    description: 'Use the public source directly while the npm package is being finalized.',
+    code: `git clone https://github.com/jawaddxb/xbpp-sdk.git
+cd xbpp-sdk
+pnpm install
+pnpm build`,
+    time: '20 seconds',
   },
   {
     title: 'Wrap Your Client',
@@ -85,7 +88,7 @@ export default function QuickStart() {
     <>
       <SEOHead
         title="xBPP Quick Start — Add Payment Governance to AI Agents in 60 Seconds"
-        description="Install @vanarchain/xbpp, wrap your x402 client, and enforce payment policies on your AI agent in under 60 seconds."
+        description="Use the open reference SDK, wrap your x402 client, and enforce payment policies on your AI agent in under 60 seconds."
         path="/learn/quick-start"
       />
       <div className="min-h-screen pt-28 pb-20 px-6 relative overflow-hidden">
@@ -106,6 +109,10 @@ export default function QuickStart() {
           </p>
         </header>
         
+        <div className="mb-8 p-4 rounded-xl border border-amber-300/60 bg-amber-50/70 text-amber-900 text-sm">
+          <strong>Package status:</strong> <code>@vanarchain/xbpp</code> will be published after v1 stabilization. Use the repository source during launch phase.
+        </div>
+
         {/* Steps */}
         <div className="space-y-8 mb-12">
           {steps.map((step, index) => (
