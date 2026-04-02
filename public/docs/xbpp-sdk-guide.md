@@ -13,13 +13,13 @@
 ## Installation
 
 ```bash
-npm install @anthropic/xbpp
+npm install @vanarchain/xbpp
 ```
 
 ## 30-Second Integration
 
 ```typescript
-import { xbpp } from '@anthropic/xbpp';
+import { xbpp } from '@vanarchain/xbpp';
 import { x402Client } from '@coinbase/x402';
 
 // Wrap your x402 client with xBPP protection
@@ -196,7 +196,7 @@ await xbpp.resolveEscalation(escalationId, {
 ## Blocked Payments
 
 ```typescript
-import { xbpp, BlockedError } from '@anthropic/xbpp';
+import { xbpp, BlockedError } from '@vanarchain/xbpp';
 
 try {
   const response = await client.fetch(url);
@@ -220,7 +220,7 @@ try {
 ## Escalation Timeout
 
 ```typescript
-import { EscalationTimeoutError } from '@anthropic/xbpp';
+import { EscalationTimeoutError } from '@vanarchain/xbpp';
 
 try {
   const response = await client.fetch(url);
@@ -252,7 +252,7 @@ For advanced use cases, you can use the interpreter directly without the x402 wr
 ## Evaluate an Action
 
 ```typescript
-import { XBPPInterpreter } from '@anthropic/xbpp';
+import { XBPPInterpreter } from '@vanarchain/xbpp';
 
 const interpreter = new XBPPInterpreter({
   registry: myRegistry, // Optional: custom registry
@@ -531,7 +531,7 @@ await interpreter.deactivateKillSwitch({
 ## Mock Interpreter
 
 ```typescript
-import { MockInterpreter } from '@anthropic/xbpp/testing';
+import { MockInterpreter } from '@vanarchain/xbpp/testing';
 
 const mockInterpreter = new MockInterpreter({
   defaultDecision: 'ALLOW',
@@ -554,7 +554,7 @@ const client = xbpp.wrap(x402Client, policy, {
 ## Test Fixtures
 
 ```typescript
-import { fixtures } from '@anthropic/xbpp/testing';
+import { fixtures } from '@vanarchain/xbpp/testing';
 
 // Pre-built actions for common scenarios
 const smallPayment = fixtures.action.smallPayment();
@@ -569,7 +569,7 @@ const lenientPolicy = fixtures.policy.lenient();
 ## Assertion Helpers
 
 ```typescript
-import { expect } from '@anthropic/xbpp/testing';
+import { expect } from '@vanarchain/xbpp/testing';
 
 const verdict = await interpreter.evaluate(action, policy);
 
@@ -599,7 +599,7 @@ import type {
   Evidence,
   Audit,
   Escalation,
-} from '@anthropic/xbpp';
+} from '@vanarchain/xbpp';
 ```
 
 ## Helper Types
@@ -613,7 +613,7 @@ import type {
   EscalationResponse,
   ConfirmPayload,
   VoidPayload,
-} from '@anthropic/xbpp';
+} from '@vanarchain/xbpp';
 ```
 
 ## Type Guards
@@ -624,7 +624,7 @@ import {
   isEscalationError,
   isPayAction,
   isPayPolicy,
-} from '@anthropic/xbpp';
+} from '@vanarchain/xbpp';
 
 if (isBlockedError(error)) {
   // TypeScript knows error is BlockedError
@@ -664,7 +664,7 @@ console.log(verdict.audit.state_snapshot);
 ## Why Was This Blocked?
 
 ```typescript
-import { explainVerdict } from '@anthropic/xbpp';
+import { explainVerdict } from '@vanarchain/xbpp';
 
 const verdict = await interpreter.evaluate(action, policy);
 

@@ -68,7 +68,7 @@ interface Scenario {
   name: string;
   category: Category;
   narrative?: string;
-  xbpp_context?: any;
+  xbpp_context?: unknown;
 }
 
 

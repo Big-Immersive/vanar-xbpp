@@ -269,7 +269,7 @@ export default function Playground() {
               {/* Posture */}
               <div className="mb-6">
                 <label className="text-sm text-muted-foreground mb-2 block">Posture</label>
-                <Select value={config.posture} onValueChange={(v: any) => setConfig(prev => ({ ...prev, posture: v }))}>
+                <Select value={config.posture} onValueChange={(v) => setConfig(prev => ({ ...prev, posture: v as PolicyConfig['posture'] }))}>
                   <SelectTrigger className="bg-background">
                     <SelectValue />
                   </SelectTrigger>

@@ -118,7 +118,7 @@ xBPP is designed to work with the x402 payment protocol. The typical integration
 5. Escalations invoke your approval callback
 
 ```typescript
-import { xbpp } from '@anthropic/xbpp';
+import { xbpp } from '@vanarchain/xbpp';
 import { x402Client } from '@coinbase/x402';
 
 const client = xbpp.wrap(x402Client, {
