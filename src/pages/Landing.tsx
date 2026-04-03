@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { SEOHead } from '@/components/seo';
 import { AnimatedBackground, ScrollReveal } from '@/components/effects';
 import {
